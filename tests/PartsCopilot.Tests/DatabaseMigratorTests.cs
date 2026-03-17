@@ -29,7 +29,7 @@ public class DatabaseMigratorTests : IDisposable
 
         await migrator.MigrateAsync();
 
-        migrator.CurrentVersion.Should().Be(1);
+        migrator.CurrentVersion.Should().Be(migrator.TargetVersion, "should apply all migrations");
 
         // Verify tables exist by querying them
         var manuals = await _db.Table<ManualEntity>().CountAsync();
@@ -56,7 +56,7 @@ public class DatabaseMigratorTests : IDisposable
 
         var versionEntry = await _db.Table<SchemaVersionEntry>().FirstOrDefaultAsync();
         versionEntry.Should().NotBeNull();
-        versionEntry!.Version.Should().Be(1);
+        versionEntry!.Version.Should().Be(migrator.TargetVersion, "should apply all migrations");
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class DatabaseMigratorTests : IDisposable
         await migrator.MigrateAsync();
 
         var logs = await migrator.GetMigrationHistoryAsync();
-        logs.Should().HaveCount(1);
+        logs.Should().HaveCount(migrator.TargetVersion, "one log entry per migration");
         logs[0].Version.Should().Be(1);
         logs[0].Name.Should().Be("Baseline schema");
         logs[0].Success.Should().BeTrue();
@@ -83,7 +83,7 @@ public class DatabaseMigratorTests : IDisposable
         await migrator.MigrateAsync(); // second run
 
         var logs = await migrator.GetMigrationHistoryAsync();
-        logs.Should().HaveCount(1, "migration should only run once");
+        logs.Should().HaveCount(migrator.TargetVersion, "migrations should only run once each");
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class DatabaseMigratorTests : IDisposable
         var appDb = new AppDatabase(_dbPath);
         await appDb.InitializeAsync();
 
-        appDb.Migrator.CurrentVersion.Should().Be(1);
+        appDb.Migrator.CurrentVersion.Should().Be(appDb.Migrator.TargetVersion, "should apply all migrations");
 
         // Tables should be usable
         var count = await appDb.Connection.Table<PartEntity>().CountAsync();

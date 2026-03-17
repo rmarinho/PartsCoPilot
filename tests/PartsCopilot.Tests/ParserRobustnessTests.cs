@@ -86,18 +86,7 @@ public class ParserRobustnessTests
     [Fact]
     public async Task Illustration_Illus_Variation()
     {
-        var page = new ManualPage
-        {
-            ManualId = "test",
-            PageNumber = 1,
-            RawText = "Illus: 102-03 Parts list",
-            PageType = "part_table"
-        };
-
-        var service = new PdfIngestionService();
-        var pages = await service.ExtractPagesAsync("dummy.pdf", "test");
-        
-        // Can't test ExtractPages without a real PDF, but we can verify the regex works
+        // Verify the regex works for "Illus:" variation
         var illustration = System.Text.RegularExpressions.Regex.Match(
             "Illus: 102-03 Parts list", 
             @"(?:Illustration|Illus|Fig\.?)\s*:?\s*(\d{3}-\d{2})",

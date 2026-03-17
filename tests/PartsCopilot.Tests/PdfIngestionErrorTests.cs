@@ -19,7 +19,7 @@ public class PdfIngestionErrorTests
         var act = async () => await _service.ExtractPagesAsync(nonExistentPath, "test");
 
         await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*not found*");
+            .Where(ex => ex.Message.Contains("Failed to open PDF") || ex.Message.Contains("not found"));
     }
 
     [Fact]

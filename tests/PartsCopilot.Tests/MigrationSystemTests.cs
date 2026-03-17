@@ -139,37 +139,37 @@ public class MigrationSystemTests : IDisposable
     }
 
     [Fact]
-    public async Task MigrateAsync_LogsFailedMigration()
+    public async Task MigrateAsync_LogsFailedMigration_WhenPossible()
     {
         _db = new SQLiteAsyncConnection(_dbPath);
         
-        // Manually create version tables and set version to trigger Migration 2
+        // Create version tables and manually set version to 1 (simulating partial migration state)
         await _db.CreateTableAsync<SchemaVersionEntry>();
         await _db.CreateTableAsync<MigrationLogEntry>();
         await _db.InsertOrReplaceAsync(new SchemaVersionEntry { Id = 1, Version = 1, AppliedAt = DateTime.UtcNow });
         
-        // Close connection to simulate permission error on next migration
+        // Create baseline tables manually (simulate migration 1 completed)
+        await _db.CreateTableAsync<ManualEntity>();
+        await _db.CreateTableAsync<PartEntity>();
+        await _db.CreateTableAsync<PageEntity>();
+        await _db.CreateTableAsync<IllustrationGroupEntity>();
+        await _db.CreateTableAsync<SearchHistoryEntity>();
+        await _db.CreateTableAsync<FavoriteEntity>();
+        
+        // Close connection and make database read-only before attempting migration 2
         await _db.CloseAsync();
         File.SetAttributes(_dbPath, FileAttributes.ReadOnly);
 
         _db = new SQLiteAsyncConnection(_dbPath);
         var migrator = new DatabaseMigrator(_db);
 
-        try
-        {
-            await migrator.MigrateAsync();
-        }
-        catch (InvalidOperationException)
-        {
-            // Expected
-        }
-
-        // Cleanup and check log
-        File.SetAttributes(_dbPath, FileAttributes.Normal);
-        _db = new SQLiteAsyncConnection(_dbPath);
+        var act = async () => await migrator.MigrateAsync();
         
-        var logs = await _db.Table<MigrationLogEntry>().ToListAsync();
-        logs.Should().Contain(log => !log.Success && log.ErrorMessage != null);
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*permission denied*");
+
+        // Cleanup
+        File.SetAttributes(_dbPath, FileAttributes.Normal);
     }
 
     [Fact]

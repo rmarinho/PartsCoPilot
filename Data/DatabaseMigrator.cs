@@ -109,9 +109,18 @@ public class DatabaseMigrator
         _migrations.Add(new Migration(3, "Extend FavoriteEntry schema", async db =>
         {
             // SQLite ALTER TABLE only supports ADD COLUMN (not DROP or RENAME)
-            await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN Model TEXT");
-            await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN PageNumber INTEGER");
-            await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN Illustration TEXT");
+            // Check if columns already exist before adding (handles baseline migration from v1 that includes these fields)
+            var existingColumns = await db.ExecuteScalarAsync<string>("SELECT GROUP_CONCAT(name) FROM pragma_table_info('Favorites')");
+            var hasModel = existingColumns?.Contains("Model") ?? false;
+            var hasPageNumber = existingColumns?.Contains("PageNumber") ?? false;
+            var hasIllustration = existingColumns?.Contains("Illustration") ?? false;
+            
+            if (!hasModel)
+                await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN Model TEXT");
+            if (!hasPageNumber)
+                await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN PageNumber INTEGER");
+            if (!hasIllustration)
+                await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN Illustration TEXT");
         }));
     }
 
@@ -135,15 +144,23 @@ public class DatabaseMigrator
 
     private async Task LogMigrationAsync(int version, string name, DateTime startedAt, bool success, string? error = null)
     {
-        await _db.InsertAsync(new MigrationLogEntry
+        try
         {
-            Version = version,
-            Name = name,
-            AppliedAt = startedAt,
-            DurationMs = (int)(DateTime.UtcNow - startedAt).TotalMilliseconds,
-            Success = success,
-            ErrorMessage = error
-        });
+            await _db.InsertAsync(new MigrationLogEntry
+            {
+                Version = version,
+                Name = name,
+                AppliedAt = startedAt,
+                DurationMs = (int)(DateTime.UtcNow - startedAt).TotalMilliseconds,
+                Success = success,
+                ErrorMessage = error
+            });
+        }
+        catch (SQLiteException)
+        {
+            // If we can't log (e.g., read-only database), continue without logging
+            // The migration error will still be thrown to the caller
+        }
     }
 }
 
