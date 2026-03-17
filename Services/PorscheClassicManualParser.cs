@@ -108,8 +108,25 @@ public partial class PorscheClassicManualParser : IManualParser
 
     private static string? ExtractQuantity(string context)
     {
-        var match = Regex.Match(context, @"\b(\d+)\s*$|\s+(\d)\s+");
-        return match.Success ? (match.Groups[1].Value + match.Groups[2].Value).Trim() : null;
+        // Try patterns in order of specificity:
+        // 1. "Qty: 3" or "Qty 3" or "QTY:3"
+        var match = Regex.Match(context, @"\bQty\s*[:.]?\s*(\d+)", RegexOptions.IgnoreCase);
+        if (match.Success) return match.Groups[1].Value;
+
+        // 2. Quantity with unit: "2 pcs", "1 set", "4 ea"
+        match = Regex.Match(context, @"\b(\d+)\s*(?:pcs?|sets?|ea|each|pieces?|pair)\b", RegexOptions.IgnoreCase);
+        if (match.Success) return match.Groups[1].Value;
+
+        // 3. Standalone single/double digit between whitespace (common in tabular rows)
+        //    Must not be part of a part number, year, or page number
+        match = Regex.Match(context, @"(?<=\s)(\d{1,2})(?=\s+(?:911|912|[A-Z])|\s*$)");
+        if (match.Success) return match.Groups[1].Value;
+
+        // 4. Digit at end of line
+        match = Regex.Match(context, @"\s(\d{1,2})\s*$");
+        if (match.Success) return match.Groups[1].Value;
+
+        return null;
     }
 
     private static string? ExtractModel(string context)
@@ -131,6 +148,6 @@ public partial class PorscheClassicManualParser : IManualParser
         return match.Success ? match.Groups[1].Value : null;
     }
 
-    [GeneratedRegex(@"\b[A-Z0-9]{3}\s\d{3}\s\d{3}\s\d{2}\b|\bN\s\d{3}\s\d{3}\s\d{2}\b|\bPCG\s\d{3}\s\d{3}\s\d{2}\b")]
+    [GeneratedRegex(@"\b[A-Z0-9]{3}[\s\-]\d{3}[\s\-]\d{3}[\s\-]\d{2}\b|\bN[\s\-]\d{3}[\s\-]\d{3}[\s\-]\d{2}\b|\bPCG[\s\-]\d{3}[\s\-]\d{3}[\s\-]\d{2}\b")]
     private static partial Regex PartNumberRegex();
 }

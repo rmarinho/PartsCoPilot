@@ -11,8 +11,10 @@
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0" />
     <PackageReference Include="FluentAssertions" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0-*" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
     <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+    <PackageReference Include="PdfPig" Version="0.1.13" />
   </ItemGroup>
   <ItemGroup>
     <!-- Link source files instead of project reference (MAUI project can't be referenced by net11.0) -->
@@ -20,19 +22,19 @@
     <Compile Include="../../Services/PorscheClassicManualParser.cs" Link="Services/PorscheClassicManualParser.cs" />
     <Compile Include="../../Services/PdfIngestionService.cs" Link="Services/PdfIngestionService.cs" />
     <Compile Include="../../Services/Interfaces.cs" Link="Services/Interfaces.cs" />
+    <Compile Include="../../Services/PromptBuilder.cs" Link="Services/PromptBuilder.cs" />
+    <Compile Include="../../Services/TokenEstimator.cs" Link="Services/TokenEstimator.cs" />
+    <Compile Include="../../Services/ContextTrimmer.cs" Link="Services/ContextTrimmer.cs" />
     <Compile Include="../../Models/SearchModels.cs" Link="Models/SearchModels.cs" />
     <Compile Include="../../Models/ManualModels.cs" Link="Models/ManualModels.cs" />
     <Compile Include="../../Models/AppModels.cs" Link="Models/AppModels.cs" />
     <Compile Include="../../Models/AiModels.cs" Link="Models/AiModels.cs" />
     <Compile Include="../../Data/Entities.cs" Link="Data/Entities.cs" />
     <Compile Include="../../Data/AppDatabase.cs" Link="Data/AppDatabase.cs" />
+    <Compile Include="../../Data/DatabaseMigrator.cs" Link="Data/DatabaseMigrator.cs" />
     <Compile Include="../../Data/PartsRepository.cs" Link="Data/PartsRepository.cs" />
     <Compile Include="../../Data/SeedDataService.cs" Link="Data/SeedDataService.cs" />
     <Compile Include="../../Data/UserDataRepository.cs" Link="Data/UserDataRepository.cs" />
     <Compile Include="../../Services/ManualNavigationService.cs" Link="Services/ManualNavigationService.cs" />
-    <Compile Include="../../Services/PromptBuilder.cs" Link="Services/PromptBuilder.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="PdfPig" Version="0.1.13" />
   </ItemGroup>
 </Project>

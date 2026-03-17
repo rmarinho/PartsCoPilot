@@ -63,6 +63,25 @@ public interface ISearchService
 }
 
 /// <summary>
+/// Estimates token count for a given text.
+/// </summary>
+public interface ITokenEstimator
+{
+    int EstimateTokens(string? text);
+}
+
+/// <summary>
+/// Trims context to fit within a token budget, preserving highest-relevance results.
+/// </summary>
+public interface IContextTrimmer
+{
+    TrimmedContext TrimToFit(
+        IReadOnlyList<SearchCandidate> candidates,
+        IReadOnlyList<string> snippets,
+        ContextBudget budget);
+}
+
+/// <summary>
 /// Builds retrieval-grounded prompts for the AI layer.
 /// </summary>
 public interface IPromptBuilder
