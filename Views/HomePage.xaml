@@ -23,8 +23,11 @@
             <VerticalStackLayout Spacing="20" Padding="0,10">
 
                 <!-- Manual Status Card -->
-                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                       CornerRadius="12" Padding="20" HasShadow="False">
+                <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                        Padding="20" Stroke="Transparent">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Active Manual"
                                FontSize="14" TextColor="Gray" FontAttributes="Bold" />
@@ -34,7 +37,7 @@
                                FontSize="14" TextColor="Gray"
                                IsVisible="{Binding HasManual}" />
                     </VerticalStackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Import Button -->
                 <Button Text="📄 Import Parts Manual (PDF)"

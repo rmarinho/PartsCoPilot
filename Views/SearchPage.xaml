@@ -68,8 +68,11 @@
                             IsVisible="{Binding HasResults}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:SearchCandidateViewModel">
-                        <Frame Margin="0,4" Padding="12" CornerRadius="8" HasShadow="False"
-                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                        <Border Margin="0,4" Padding="12" Stroke="Transparent"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
                             <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
 
                                 <!-- Part Number -->
@@ -79,11 +82,14 @@
                                        FontFamily="OpenSansRegular" />
 
                                 <!-- Score Badge -->
-                                <Frame Grid.Row="0" Grid.Column="1"
-                                       BackgroundColor="{StaticResource Primary}"
-                                       CornerRadius="10" Padding="6,2" HasShadow="False">
+                                <Border Grid.Row="0" Grid.Column="1"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        Padding="6,2" Stroke="Transparent">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10" />
+                                    </Border.StrokeShape>
                                     <Label Text="{Binding Score}" TextColor="White" FontSize="11" />
-                                </Frame>
+                                </Border>
 
                                 <!-- Description -->
                                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
@@ -123,7 +129,7 @@
                                        FontSize="11" TextColor="Gray" FontAttributes="Italic"
                                        Margin="0,2,0,0" />
                             </Grid>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
