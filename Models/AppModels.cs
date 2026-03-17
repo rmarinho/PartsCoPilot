@@ -21,6 +21,9 @@ public sealed record FavoriteEntry
     public required string PartRecordId { get; init; }
     public required string PartNumber { get; init; }
     public required string Description { get; init; }
+    public string? Model { get; init; }
+    public int PageNumber { get; init; }
+    public string? Illustration { get; init; }
     public string? ManualId { get; init; }
     public DateTime SavedAt { get; init; } = DateTime.UtcNow;
 }

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             xmlns:models="clr-namespace:PartsCopilot.Models"
+             x:Class="PartsCopilot.Views.ComparePartsPage"
+             x:DataType="vm:ComparePartsViewModel"
+             Title="Compare Parts">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header with swap button -->
+        <Grid Padding="16,12" ColumnDefinitions="*,Auto" BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+            <Label Text="⚖️ Part Comparison" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="🔄 Swap" Command="{Binding SwapPartsCommand}"
+                    IsVisible="{Binding HasBothParts}"
+                    FontSize="13" Padding="12,6"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="16">
+            <VerticalStackLayout Spacing="16">
+
+                <!-- Part A header -->
+                <Label Text="Part A" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                <Border Padding="12" Stroke="Transparent"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{Binding LeftPart.PartNumber}" FontSize="18" FontAttributes="Bold" />
+                        <Label Text="{Binding LeftPart.Description}" FontSize="14" TextColor="Gray" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Search panel for picking Part B -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding ShowSearchPanel}">
+                    <Label Text="Select Part B to Compare" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Border Padding="8,4" Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                            <Entry Text="{Binding SearchQuery}" Placeholder="Search by part number or description..."
+                                   ReturnCommand="{Binding SearchCommand}" ReturnType="Search"
+                                   FontSize="14" />
+                        </Border>
+                        <Button Grid.Column="1" Text="🔍" Command="{Binding SearchCommand}"
+                                FontSize="16" Padding="12,8" CornerRadius="8"
+                                BackgroundColor="{StaticResource Primary}" TextColor="White" />
+                    </Grid>
+
+                    <ActivityIndicator IsRunning="{Binding IsSearching}" IsVisible="{Binding IsSearching}"
+                                       HeightRequest="30" Color="{StaticResource Primary}" />
+
+                    <CollectionView ItemsSource="{Binding SearchResults}" SelectionMode="None"
+                                    MaximumHeightRequest="300">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:PartRecord">
+                                <Border Padding="10" Margin="0,2" Stroke="Transparent"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ComparePartsViewModel}}, Path=SelectPartCommand}"
+                                                              CommandParameter="{Binding}" />
+                                    </Border.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label Text="{Binding PartNumber}" FontSize="15" FontAttributes="Bold" />
+                                            <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" Text="Select ›" FontSize="12"
+                                               TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="Search for a part to compare" FontSize="13" TextColor="Gray"
+                                   HorizontalOptions="Center" Margin="0,20" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Part B summary (shown after selection) -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding HasBothParts}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Part B" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                        <Button Grid.Column="1" Text="✕ Change" Command="{Binding ClearRightPartCommand}"
+                                FontSize="12" Padding="8,4"
+                                BackgroundColor="Transparent" TextColor="Gray" />
+                    </Grid>
+                    <Border Padding="12" Stroke="Transparent"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding RightPart.PartNumber}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding RightPart.Description}" FontSize="14" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Comparison table -->
+                <VerticalStackLayout Spacing="0" IsVisible="{Binding HasBothParts}">
+                    <Label Text="Comparison" FontSize="16" FontAttributes="Bold" Margin="0,8,0,12" />
+
+                    <!-- Column headers -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,6" ColumnSpacing="8"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}">
+                        <Label Text="Field" FontSize="12" FontAttributes="Bold" TextColor="Gray" />
+                        <Label Grid.Column="1" Text="Part A" FontSize="12" FontAttributes="Bold" TextColor="Gray" />
+                        <Label Grid.Column="2" Text="Part B" FontSize="12" FontAttributes="Bold" TextColor="Gray" />
+                    </Grid>
+
+                    <!-- Part Number -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding PartNumbersMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Part #" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.PartNumber}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.PartNumber}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Description -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding DescriptionsMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Description" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Description}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Description}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Model -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding ModelsMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Model" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Model}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Model}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Illustration -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding IllustrationsMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Illustration" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Illustration}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Illustration}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Section -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding SectionsMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Section" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Section}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Section}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Page -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding PagesMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Page" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.PageNumber}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.PageNumber}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Quantity -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding QuantitiesMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Quantity" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Quantity}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Quantity}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Position -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding PositionsMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Position" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Position}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Position}" FontSize="13" />
+                    </Grid>
+
+                    <!-- Remark -->
+                    <Grid ColumnDefinitions="100,*,*" Padding="8,10" ColumnSpacing="8"
+                          BackgroundColor="{Binding RemarksMatch, Converter={StaticResource CompareFieldBackgroundConverter}}">
+                        <Label Text="Remark" FontSize="12" FontAttributes="Bold" TextColor="Gray" VerticalOptions="Start" />
+                        <Label Grid.Column="1" Text="{Binding LeftPart.Remark}" FontSize="13" />
+                        <Label Grid.Column="2" Text="{Binding RightPart.Remark}" FontSize="13" />
+                    </Grid>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

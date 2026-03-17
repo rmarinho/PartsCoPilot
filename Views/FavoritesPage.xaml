@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             x:Class="PartsCopilot.Views.FavoritesPage"
+             x:DataType="vm:FavoritesViewModel"
+             Title="Favorites &amp; History">
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+
+        <!-- Tab Selector -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,*" Margin="0,8,0,12">
+            <Button Text="⭐ Favorites"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                    TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                    CornerRadius="8"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}}, Path=SwitchToFavoritesCommand}"
+                    Margin="0,0,4,0"
+                    SemanticProperties.Description="Show favorites tab" />
+            <Button Grid.Column="1" Text="🕐 History"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                    TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                    CornerRadius="8"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}}, Path=SwitchToHistoryCommand}"
+                    Margin="4,0,0,0"
+                    SemanticProperties.Description="Show search history tab" />
+        </Grid>
+
+        <!-- Favorites Tab Content -->
+        <Grid Grid.Row="1" IsVisible="{Binding IsFavoritesTab}">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsLoadingFavorites}"
+                               IsVisible="{Binding IsLoadingFavorites}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <!-- Empty State -->
+            <VerticalStackLayout IsVisible="{Binding HasNoFavorites}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                <Label Text="No favorites yet" FontSize="18" HorizontalOptions="Center" />
+                <Label Text="Tap the ♡ on any search result to save it"
+                       FontSize="14" TextColor="Gray" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Favorites List -->
+            <CollectionView ItemsSource="{Binding Favorites}"
+                            IsVisible="{Binding HasFavorites}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FavoriteItemViewModel">
+                        <Border Margin="0,4" Padding="12" Stroke="Transparent"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+
+                                <!-- Part Number -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding PartNumber}"
+                                       FontSize="16" FontAttributes="Bold"
+                                       SemanticProperties.HeadingLevel="Level3" />
+
+                                <!-- Saved Date -->
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding SavedAt}"
+                                       FontSize="11" TextColor="Gray"
+                                       VerticalOptions="Center" />
+
+                                <!-- Description -->
+                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding Description}"
+                                       FontSize="14" TextColor="Gray" />
+
+                                <!-- Metadata -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                       Spacing="12" Margin="0,4,0,0">
+                                    <Label FontSize="12" TextColor="Gray"
+                                           Text="{Binding Model}"
+                                           IsVisible="{Binding Model, Converter={StaticResource IsNotNullConverter}}" />
+                                    <Label FontSize="12" TextColor="Gray">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="📄 p." />
+                                                <Span Text="{Binding PageNumber}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label FontSize="12" TextColor="Gray"
+                                           IsVisible="{Binding Illustration, Converter={StaticResource IsNotNullConverter}}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="📋 " />
+                                                <Span Text="{Binding Illustration}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </HorizontalStackLayout>
+
+                                <!-- Remove Favorite -->
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                        Text="♥ Remove from Favorites"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}}, Path=RemoveFavoriteCommand}"
+                                        CommandParameter="{Binding}"
+                                        FontSize="12"
+                                        BackgroundColor="Transparent"
+                                        TextColor="Red"
+                                        Padding="0,4"
+                                        HorizontalOptions="Start"
+                                        MinimumHeightRequest="44"
+                                        SemanticProperties.Description="Remove from favorites" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- History Tab Content -->
+        <Grid Grid.Row="1" IsVisible="{Binding IsHistoryTab}">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsLoadingHistory}"
+                               IsVisible="{Binding IsLoadingHistory}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <!-- Empty State -->
+            <VerticalStackLayout IsVisible="{Binding HasNoHistory}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                <Label Text="No search history" FontSize="18" HorizontalOptions="Center" />
+                <Label Text="Your recent searches will appear here"
+                       FontSize="14" TextColor="Gray" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- History List -->
+            <CollectionView ItemsSource="{Binding RecentSearches}"
+                            IsVisible="{Binding HasHistory}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SearchHistoryItemViewModel">
+                        <Border Margin="0,4" Padding="12" Stroke="Transparent"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+
+                                <!-- Query Text -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding QueryText}"
+                                       FontSize="15" FontAttributes="Bold"
+                                       SemanticProperties.HeadingLevel="Level3" />
+
+                                <!-- Search Again -->
+                                <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                        Text="🔍"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}}, Path=SearchAgainCommand}"
+                                        CommandParameter="{Binding}"
+                                        FontSize="18"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                                        VerticalOptions="Center"
+                                        MinimumWidthRequest="44"
+                                        MinimumHeightRequest="44"
+                                        SemanticProperties.Description="Search again" />
+
+                                <!-- Meta -->
+                                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="12">
+                                    <Label Text="{Binding SearchedAt}"
+                                           FontSize="12" TextColor="Gray" />
+                                    <Label Text="{Binding ResultCount, StringFormat='{0} results'}"
+                                           FontSize="12" TextColor="Gray" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

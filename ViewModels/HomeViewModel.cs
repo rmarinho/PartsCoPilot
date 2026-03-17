@@ -117,4 +117,10 @@ public partial class HomeViewModel : ObservableObject
             HasManual = true;
         }
     }
+
+    [RelayCommand]
+    private async Task GoToSearchAsync()
+    {
+        await Shell.Current.GoToAsync("//search");
+    }
 }
