@@ -42,6 +42,67 @@
 
 ---
 
+---
+
+## Week 1 Agent Decisions (2026-03-17T16:44:08Z)
+
+### AI Layer Implementation Choices (Rachael)
+
+**Context:** AI layer was missing. Interfaces existed but had no implementations.
+
+**Decisions:**
+1. **Semantic Kernel 1.54.0** as orchestration layer — keeps us decoupled from specific provider
+2. **JSON-mode response format** — reliable structured output with defensive markdown stripping
+3. **API key via environment variables** — `OPENAI_API_KEY`, `OPENAI_MODEL` read at startup with fallback defaults
+4. **Grounded-only system prompt** — model can only reference candidates passed in context; must ask for clarification when ambiguous
+5. **ManualNavigationService uses IPartsRepository** — delegates page/illustration lookups to existing repository
+6. **Fixed PdfIngestionService build break** — fully qualified `UglyToad.PdfPig.Content.Page` to resolve MAUI ambiguity
+
+**Open items:** SK.Core 1.54.0 NU1904 vulnerability needs monitoring; API key config should move to settings page; add retry/timeout policies.
+
+---
+
+### Backend Hardening Decisions (Roy)
+
+**Storage model:** All 9 tables from `docs/02-architecture.md` now created.
+
+**Seed data convention:**
+- Manual ID: `seed-911-912-1965-1969`
+- File path uses `seed://` scheme
+- `SeedDataService.SeedIfEmptyAsync()` is idempotent
+- Registered as singleton in DI
+
+**Test project structure:**
+- Located at `tests/PartsCopilot.Tests/`
+- Uses source file linking (MAUI incompatibility workaround)
+- Main csproj excludes `tests/**` via `DefaultItemExcludes`
+- New source files need `<Compile Include>` link in test csproj
+
+**New repository methods:** `IPartsRepository` now includes Save/Get for LegendEntries, VehicleTypes, EngineTypes, TransmissionTypes.
+
+---
+
+### UI Completion — Shell, Favorites, Part Details (Pris)
+
+**Shell restructure:**
+- From single ShellContent to TabBar with three tabs: Home, Search, Favorites
+- `part-details` registered as detail route (not tab)
+- Navigation uses `IQueryAttributable` for data passing
+
+**FavoriteEntry schema extended:**
+- Added Model, PageNumber, Illustration fields
+- Enables favorites to display without extra DB lookups
+- Migration needed if production data exists (SQLite AddColumn)
+
+**Navigation patterns:**
+1. Tab navigation is primary pattern — Home/Search/Favorites are equal peers
+2. `ManualViewer` placeholder: `OpenPageCommand` shows DisplayAlert with page/illustration info
+3. Compare placeholder: PartDetailsPage has Compare button wired to placeholder alert
+
+**Pre-existing issue:** `tests/` directory compiled into main project — should add `<Compile Remove="tests/**" />` to csproj.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
