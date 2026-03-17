@@ -103,6 +103,33 @@
 
 ---
 
+### 2026-03-17T17:09:58Z: Development tooling — Enable MauiDevFlow for remote debugging
+**By:** Pris (UI Dev)  
+**What:** Integrated MauiDevFlow v0.23.1 (`Redth.MauiDevFlow.Agent`) into PartsCopilot for remote app debugging and visual inspection during development.  
+**Why:**
+1. Enables remote visual tree inspection from command line without manual IDE debugging
+2. Screenshot verification and UI interaction testing (tap, fill, navigate) for simulator/device testing
+3. Live property inspection and modification without full rebuild cycles
+4. Accelerates develop-deploy-inspect-fix feedback loop, especially critical for mobile testing
+
+**Configuration:**
+- Debug-only NuGet package (wildcard `*` for automatic updates)
+- Registered via `builder.AddMauiDevFlowAgent()` in `#if DEBUG` block in MauiProgram.cs
+- Mac Catalyst debug build uses separate `Platforms/MacCatalyst/Entitlements.Debug.plist` with `com.apple.security.network.server` entitlement
+- Broker-based port discovery — no manual `.mauidevflow` configuration needed
+
+**Platform Coverage:**
+- ✅ Mac Catalyst (entitlements configured)
+- ✅ iOS Simulator (out of box)
+- ⚠️ Android Emulator (requires `adb` port forwarding — future documentation)
+
+**Files Modified:**
+- `PartsCopilot.csproj` — Added `Redth.MauiDevFlow.Agent` v0.23.1 (Debug)
+- `MauiProgram.cs` — Added `builder.AddMauiDevFlowAgent()` in DEBUG block
+- `Platforms/MacCatalyst/Entitlements.Debug.plist` — Created with network server capability
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus

@@ -38,3 +38,23 @@
 - **Rachael's ManualNavigationService:** Now wired to both SearchViewModel and PartDetailsViewModel `OpenPageCommand`. When user taps "Open Page", the service navigates with page/illustration data.
 - **Roy's seed data (25 parts):** FavoritesPage and search results now populated by SeedDataService. UI queries IPartsRepository for all domain data.
 - **Roy's new models:** PartDetailsPage displays LegendEntry, VehicleType, EngineType, TransmissionType info in rich detail view.
+
+### 2026-03-17 — MauiDevFlow Setup
+**What was done:**
+- Added `Redth.MauiDevFlow.Agent` v0.23.1 NuGet package (debug-only condition)
+- Registered MauiDevFlow agent in MauiProgram.cs inside `#if DEBUG` block
+- Created `Platforms/MacCatalyst/Entitlements.Debug.plist` with `network.server` entitlement
+- Configured csproj to use debug entitlements for Mac Catalyst debug builds
+
+**Configuration notes:**
+- Package uses wildcard version `*` to always pull latest stable
+- Agent registration: `builder.AddMauiDevFlowAgent()` after all other services
+- Mac Catalyst requires `com.apple.security.network.server` entitlement for agent HTTP server
+- No `.mauidevflow` config file needed — broker handles port assignment automatically
+- This is a standard MAUI app (not Blazor Hybrid), so only the Agent package is needed
+
+**Platform support:**
+- Mac Catalyst: Entitlements configured for debug builds
+- iOS: No special setup needed
+- Android: Will need `adb reverse/forward` when running on emulator
+- This project targets net11.0 for iOS, Android, and Mac Catalyst
