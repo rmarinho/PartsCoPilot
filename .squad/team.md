@@ -19,6 +19,12 @@
 | Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
 | Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 
+## Issue Source
+
+- **Repository:** rmarinho/PartsCoPilot
+- **Connected:** 2026-03-17
+- **Filters:** All open issues
+
 ## Project Context
 
 - **Project:** PartsCopilot
