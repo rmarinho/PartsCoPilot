@@ -190,3 +190,42 @@
 
 **PR:** #27
 **Branch:** `squad/2-fix-n1-query`
+---
+
+### 2026-03-17 — Database Migration System & Parser Hardening — COMPLETED
+
+**Database Migration System (#4):**
+- DatabaseMigrator already exists, added Migrations 2 & 3
+- Migration 2: LegendEntry, VehicleType, EngineType, TransmissionType tables
+- Migration 3: ALTER TABLE Favorites to add Model, PageNumber, Illustration (with column-exists check for idempotency)
+- Error handling: disk-full (SQLite3.Result.Full), permission-denied (CantOpen/ReadOnly)
+- Failed migration logging wrapped in try-catch (can't log to read-only DB)
+- All migrations run in sequence on app startup via AppDatabase.InitializeAsync()
+
+**Parser Improvements (#12):**
+- Part number regex now supports hyphens: `[\s\-]` instead of `\s` (handles "901-101-013-00")
+- Illustration detection handles "Illus:", "Fig.", "Illustration:" (case-insensitive, optional colon)
+- Quantity extraction skips past part number to avoid false positives from trailing digits
+- Part number normalization removes both spaces and hyphens
+- PDF open wrapped in try-catch: FileNotFoundException, UnauthorizedAccessException, password-protected, generic fallback
+- PdfIngestionService now returns diagnostic error messages
+
+**Testing:**
+- 86 tests passing (24 new tests added)
+- MigrationSystemTests: 14 tests covering v2/v3 migrations, error handling, data preservation, rollback scenarios
+- ParserRobustnessTests: 21 tests covering hyphenated formats, mixed separators, illustration variations, edge cases
+- PdfIngestionErrorTests: 5 tests covering file errors, permissions, cancellation
+
+**Files changed:**
+- `Data/DatabaseMigrator.cs` — added migrations 2 & 3, error handling
+- `Data/Entities.cs` — added LegendEntryEntity, VehicleTypeEntity, EngineTypeEntity, TransmissionTypeEntity; extended FavoriteEntity
+- `Models/AppModels.cs` — added domain models for new entities; extended FavoriteEntry
+- `Services/PorscheClassicManualParser.cs` — hyphen support, quantity extraction fix, normalization
+- `Services/PdfIngestionService.cs` — illustration regex improved, PDF open error handling
+- `tests/PartsCopilot.Tests/PartsCopilot.Tests.csproj` — linked PdfIngestionService.cs
+- `tests/PartsCopilot.Tests/MigrationSystemTests.cs` — new (14 tests)
+- `tests/PartsCopilot.Tests/ParserRobustnessTests.cs` — new (21 tests)
+- `tests/PartsCopilot.Tests/PdfIngestionErrorTests.cs` — new (5 tests)
+- `tests/PartsCopilot.Tests/DatabaseMigratorTests.cs` — updated assertions for 3-migration system
+
+**Status:** ✅ PR #31 opened, all tests passing
