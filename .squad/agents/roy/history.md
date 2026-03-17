@@ -229,3 +229,18 @@
 - `tests/PartsCopilot.Tests/DatabaseMigratorTests.cs` — updated assertions for 3-migration system
 
 **Status:** ✅ PR #31 opened, all tests passing
+
+### Cross-Team Updates (2026-03-17T18:30:00Z)
+
+**Rachael's Sprint #30 — AI Context Window Management:**
+- TokenEstimator: character-based heuristic (~4 chars/token)
+- ContextBudget: configurable token limits per model (GPT-4o: 128K, GPT-4o-mini: 16K)
+- ContextTrimmer: relevance-based sorting, budget enforcement, truncation
+- All 25 context window tests passing
+- **Impact for Roy:** PartsRepository searches now compatible with AI context window constraints
+
+**Pris's UI Work (from previous session):**
+- Manual Viewer Page: text-based rendering of ManualPage.RawText from SQLite
+- Compare Parts flow: embedded search panel for Part B selection, 9-field side-by-side comparison
+- Shell restructure: Tab-based navigation (Home, Search, Favorites)
+- **Impact for Roy:** FavoriteEntry schema extended with Model, PageNumber, Illustration fields (Migration 3)
