@@ -1,16 +1,11 @@
-# Project Context
-
-- **Project:** PartsCopilot
-- **Created:** 2026-03-17
+# Scribe — History
 
 ## Core Context
 
-Agent Scribe initialized and ready for work.
-
-## Recent Updates
-
-📌 Team initialized on 2026-03-17
+- **Project:** A .NET MAUI AI-assisted parts catalog app for classic Porsche 911/912 manuals
+- **Role:** Session Logger
+- **Joined:** 2026-03-17T15:54:43.745Z
 
 ## Learnings
 
-Initial setup complete.
+<!-- Append learnings below -->

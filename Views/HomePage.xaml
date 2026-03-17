@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             x:Class="PartsCopilot.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Title="PartsCopilot">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20">
+
+        <!-- Header -->
+        <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="0,20,0,20">
+            <Label Text="🔧 PartsCopilot"
+                   FontSize="28" FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+            <Label Text="AI-Assisted Parts Finder"
+                   FontSize="16" TextColor="Gray"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" Padding="0,10">
+
+                <!-- Manual Status Card -->
+                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       CornerRadius="12" Padding="20" HasShadow="False">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Active Manual"
+                               FontSize="14" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Text="{Binding ActiveManualTitle, FallbackValue='No manual imported'}"
+                               FontSize="18" FontAttributes="Bold" />
+                        <Label Text="{Binding TotalParts, StringFormat='{0} parts indexed'}"
+                               FontSize="14" TextColor="Gray"
+                               IsVisible="{Binding HasManual}" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Import Button -->
+                <Button Text="📄 Import Parts Manual (PDF)"
+                        Command="{Binding ImportManualCommand}"
+                        IsEnabled="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        FontSize="16" />
+
+                <!-- Import Progress -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding IsImporting}">
+                    <ProgressBar Progress="{Binding ImportProgress, Converter={StaticResource ProgressConverter}}" />
+                    <Label Text="{Binding ImportStatus}"
+                           FontSize="13" TextColor="Gray"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+                <!-- Import Status (when not importing) -->
+                <Label Text="{Binding ImportStatus}"
+                       FontSize="13" TextColor="Gray"
+                       HorizontalOptions="Center"
+                       IsVisible="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}" />
+
+                <!-- Search Button -->
+                <Button Text="🔍 Search Parts"
+                        Clicked="OnSearchClicked"
+                        IsVisible="{Binding HasManual}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                        TextColor="{AppThemeBinding Light=White, Dark=Black}"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        FontSize="16" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Footer -->
+        <Label Grid.Row="2" Text="Classic vehicle parts catalog assistant"
+               FontSize="12" TextColor="Gray"
+               HorizontalOptions="Center" Padding="0,10" />
+    </Grid>
+
+</ContentPage>

@@ -1,7 +1,7 @@
 ﻿<?xml version = "1.0" encoding = "UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:PartsCopilot"
+             xmlns:converters="clr-namespace:PartsCopilot.Converters"
              x:Class="PartsCopilot.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,6 +9,9 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
+            <converters:ProgressConverter x:Key="ProgressConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

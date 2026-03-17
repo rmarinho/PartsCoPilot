@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             x:Class="PartsCopilot.Views.SearchPage"
+             x:DataType="vm:SearchViewModel"
+             Title="Search Parts">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
+
+        <!-- Search Bar -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,8">
+            <Entry Placeholder="Part number or description..."
+                   Text="{Binding QueryText}"
+                   ReturnCommand="{Binding SearchCommand}"
+                   ReturnType="Search"
+                   FontSize="16"
+                   ClearButtonVisibility="WhileEditing" />
+            <Button Grid.Column="1" Text="🔍"
+                    Command="{Binding SearchCommand}"
+                    Margin="8,0,0,0"
+                    WidthRequest="50" />
+        </Grid>
+
+        <!-- Filters -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,8">
+            <Picker Title="Model"
+                    ItemsSource="{Binding AvailableModels}"
+                    SelectedItem="{Binding SelectedModel}"
+                    WidthRequest="120" />
+            <Picker Title="Year"
+                    ItemsSource="{Binding AvailableYears}"
+                    SelectedItem="{Binding SelectedYear}"
+                    WidthRequest="100" />
+            <Button Text="✕ Clear"
+                    Command="{Binding ClearFiltersCommand}"
+                    FontSize="12"
+                    BackgroundColor="Transparent"
+                    TextColor="Gray"
+                    Padding="4" />
+        </HorizontalStackLayout>
+
+        <!-- Results -->
+        <Grid Grid.Row="2">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsSearching}"
+                               IsVisible="{Binding IsSearching}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+
+            <!-- No Results -->
+            <VerticalStackLayout IsVisible="{Binding HasNoResults}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                <Label Text="No parts found" FontSize="18" HorizontalOptions="Center" />
+                <Label Text="Try a different search or adjust filters"
+                       FontSize="14" TextColor="Gray" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!-- Error -->
+            <Label Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+                   TextColor="Red" FontSize="14"
+                   VerticalOptions="Center" HorizontalOptions="Center" />
+
+            <!-- Result List -->
+            <CollectionView ItemsSource="{Binding Results}"
+                            IsVisible="{Binding HasResults}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SearchCandidateViewModel">
+                        <Frame Margin="0,4" Padding="12" CornerRadius="8" HasShadow="False"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+
+                                <!-- Part Number -->
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding PartNumber}"
+                                       FontSize="16" FontAttributes="Bold"
+                                       FontFamily="OpenSansRegular" />
+
+                                <!-- Score Badge -->
+                                <Frame Grid.Row="0" Grid.Column="1"
+                                       BackgroundColor="{StaticResource Primary}"
+                                       CornerRadius="10" Padding="6,2" HasShadow="False">
+                                    <Label Text="{Binding Score}" TextColor="White" FontSize="11" />
+                                </Frame>
+
+                                <!-- Description -->
+                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding Description}"
+                                       FontSize="14" TextColor="Gray" />
+
+                                <!-- Metadata Row -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                       Spacing="12" Margin="0,4,0,0">
+                                    <Label FontSize="12" TextColor="Gray">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="📋 " />
+                                                <Span Text="{Binding Illustration, FallbackValue='-'}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label FontSize="12" TextColor="Gray">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="📄 p." />
+                                                <Span Text="{Binding PageNumber}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                    <Label FontSize="12" TextColor="Gray"
+                                           Text="{Binding Quantity, StringFormat='Qty: {0}'}"
+                                           IsVisible="{Binding Quantity, Converter={StaticResource IsNotNullConverter}}" />
+                                    <Label FontSize="12" TextColor="Gray"
+                                           Text="{Binding Model}"
+                                           IsVisible="{Binding Model, Converter={StaticResource IsNotNullConverter}}" />
+                                </HorizontalStackLayout>
+
+                                <!-- Match Reason -->
+                                <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                       Text="{Binding MatchReason}"
+                                       FontSize="11" TextColor="Gray" FontAttributes="Italic"
+                                       Margin="0,2,0,0" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Status Bar -->
+        <HorizontalStackLayout Grid.Row="3" Spacing="12" Padding="0,8"
+                               IsVisible="{Binding HasResults}">
+            <Label Text="{Binding TotalMatches, StringFormat='{0} results'}"
+                   FontSize="12" TextColor="Gray" />
+            <Label Text="{Binding SearchDuration}"
+                   FontSize="12" TextColor="Gray" />
+        </HorizontalStackLayout>
+
+    </Grid>
+
+</ContentPage>

@@ -12,6 +12,12 @@
 
 | Name | Role | Charter | Status |
 |------|------|---------|--------|
+| Deckard | Lead | `.squad/agents/deckard/charter.md` | ✅ Active |
+| Roy | Backend Dev | `.squad/agents/roy/charter.md` | ✅ Active |
+| Pris | UI Dev | `.squad/agents/pris/charter.md` | ✅ Active |
+| Rachael | AI Dev | `.squad/agents/rachael/charter.md` | ✅ Active |
+| Scribe | Session Logger | `.squad/agents/scribe/charter.md` | 📋 Silent |
+| Ralph | Work Monitor | `.squad/agents/ralph/charter.md` | 🔄 Monitor |
 
 ## Project Context
 
