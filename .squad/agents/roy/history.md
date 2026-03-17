@@ -156,3 +156,37 @@
 **Status:** ✅ Committed as f5d8e4e, ready for first CI run
 
 **Decision merged to:** `.squad/decisions.md` (2026-03-17T18:13:09Z)
+
+### 2026-03-17 — Fix N+1 Query in SearchPartsAsync (Issue #2) — COMPLETED
+
+**Problem:** `SearchPartsAsync` loaded ALL parts into memory via `.ToListAsync()`, then filtered with LINQ-to-Objects. For manuals with 1000+ parts, this caused memory bloat and poor performance. Exact match path also filtered ManualId in-memory after loading all matching records.
+
+**Fix applied:**
+- Replaced in-memory filtering with parameterized SQL `LIKE` queries via `QueryAsync<PartEntity>`
+- Exact part number match now includes `ManualId` in the SQL `WHERE` clause
+- Added `pageSize` (default 100) and `offset` (default 0) parameters for pagination
+- Added `EscapeLike()` helper to safely escape `%`, `_`, `\` in user input before SQL LIKE
+- Added composite index `IX_Parts_ManualId_SearchText` on `(ManualId, SearchText)` for search performance
+- Updated `HybridSearchService` caller to use named `ct:` parameter
+
+**Tests added (5 new, 102 total):**
+- `SearchParts_Pagination_RespectsPageSize` — pages of 3 from 10 results
+- `SearchParts_Pagination_OffsetBeyondResults_ReturnsEmpty` — offset past data
+- `SearchParts_SqlLevel_DoesNotLoadAllParts` — 200 parts, only 5 match
+- `SearchParts_ManualIdFilter_WorksAtSqlLevel` — cross-manual filtering
+- `SearchParts_ExactMatch_AlsoFiltersByManualId` — exact PN + manual scope
+
+**Validation:**
+- ✅ 102/102 tests passing, 0 failures
+- ✅ `dotnet build -f net11.0-maccatalyst` — 0 errors
+- ✅ Search completes in <500ms
+
+**Files changed:**
+- `Data/PartsRepository.cs` — SQL LIKE queries, pagination, EscapeLike
+- `Data/AppDatabase.cs` — composite index
+- `Services/Interfaces.cs` — pagination parameters on IPartsRepository
+- `Services/HybridSearchService.cs` — named parameter fix
+- `tests/PartsCopilot.Tests/PartsRepositoryTests.cs` — 5 new tests
+
+**PR:** #27
+**Branch:** `squad/2-fix-n1-query`

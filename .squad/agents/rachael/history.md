@@ -10,6 +10,15 @@
 
 <!-- Append learnings below -->
 
+### 2025-07-17 — Prompt Injection Fix (Issue #1)
+- `PromptBuilder.BuildPrompt()` had raw user input interpolated at line 91 — classic injection vector.
+- Fix: wrapped user input in `<user_query>` delimiter tags, added Rule 10 to system preamble marking tag contents as untrusted.
+- Sanitization: trim → 500-char truncation → escape `<user_query>` / `</user_query>` tokens in user input to prevent tag breakout.
+- Test project uses source-file linking — must add `<Compile Include>` in test csproj for any new source file tests need. Added `PromptBuilder.cs` link.
+- 25 new tests cover: normal operation, 4 adversarial injection patterns, delimiter escape, length limits, null/empty/whitespace, special characters (including Unicode), and full context integration.
+- The system preamble itself references `<user_query>` in Rule 10 — tests must account for this when counting tag occurrences (split gives N+1).
+- PR #26 opened, 102/102 tests green, maccatalyst build clean.
+
 ### 2025-07-15 — AI Layer Bootstrap
 - Added `Microsoft.SemanticKernel` 1.54.0 to the project. NU1904 warning on SK.Core — known upstream vuln, not actionable on our side yet.
 - `IPromptBuilder` / `PromptBuilder`: System prompt enforces grounded-only answers, no invented part numbers, structured JSON output matching `AiAnswer`. Accepts `PromptContext` with candidates + snippets.
