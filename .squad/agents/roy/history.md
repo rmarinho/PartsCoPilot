@@ -10,6 +10,37 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-17 — Week 1 Delivery: SemanticKernel Upgrade + AI Resilience — COMPLETED
+
+**Upgrade: Microsoft.SemanticKernel 1.54.0 → 1.73.0**
+- Resolved critical vulnerability NU1904 (GHSA-2ww3-72rp-wpp4)
+- Minor version bump, backward compatible (SK follows semver)
+- Rachael's AI layer implementation unaffected
+
+**Resilience hardening added to PartsAiService:**
+- 30-second timeout per LLM call via `CancellationTokenSource.CreateLinkedTokenSource` + `CancelAfter`
+- Up to 3 retries with exponential backoff: 1s, 3s, 8s
+- Retryable conditions: 429 (rate limit), 502, 503, 504, 408
+- Caller cancellation always propagates immediately (only timeout triggers retry)
+- Empty responses also retry before falling back
+- BCL-only implementation (no Polly dependency)
+
+**Validation:**
+- ✅ `dotnet build -f net11.0-maccatalyst` — 0 errors, NU1904 gone
+- ✅ `dotnet test` — 72/72 tests passing
+- ✅ No breaking API changes
+
+**Cross-team impact:**
+- Rachael: SK kernel builder API unchanged
+- Pris: No UI impact
+- All: Vulnerability resolved, AI calls resilient to transient failures
+
+**Files changed:**
+- `PartsCopilot.csproj` — version bump
+- `Services/PartsAiService.cs` — retry + timeout logic
+
+---
+
 ### 2026-03-17 — Test Suite Expansion (28 → 72 tests) — COMPLETED
 
 **New test files added:**
@@ -57,3 +88,20 @@
 ### 2026-03-17 — Integration Points with Rachael & Pris
 - **Rachael's AI layer:** Seed data (25 parts) is fed to PromptBuilder as AI context. ManualNavigationService queries repository for page lookups.
 - **Pris's UI:** Seed data populates search results, favorites list, and part details. Pris integrated IPartsRepository for UI data binding.
+
+### 2026-03-17 — SemanticKernel Upgrade & AI Resilience
+
+**SemanticKernel upgrade:** `1.54.0` → `1.73.0` in PartsCopilot.csproj. This resolves critical vulnerability NU1904 (GHSA-2ww3-72rp-wpp4). Build confirmed zero NU1904 warnings.
+
+**Retry/timeout policy added to PartsAiService:**
+- 30-second timeout per LLM call via `CancellationTokenSource.CreateLinkedTokenSource` + `CancelAfter`
+- Up to 3 retries with exponential backoff (1s, 3s, 8s) for transient HTTP failures
+- Retryable conditions: 429 (rate limit), 502, 503, 504, 408 — detected via `HttpRequestException.StatusCode`
+- Caller cancellation (`ct`) always propagates immediately — only timeout triggers retry
+- Empty responses also retry before falling back
+- No new dependencies added — pure BCL implementation, no Polly needed
+- All 72 existing tests still pass after changes
+
+**Files changed:**
+- `PartsCopilot.csproj` — SK version bump
+- `Services/PartsAiService.cs` — retry loop, timeout, transient detection

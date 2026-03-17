@@ -171,6 +171,72 @@
 
 ---
 
+### 2026-03-17T17:38:13Z: Compare Parts Flow — In-Page Search for Part B Selection (IMPLEMENTED)
+**By:** Pris (UI Dev)  
+**Status:** Completed  
+**Context:** Compare Parts feature required to allow users to select a second part (Part B) for side-by-side comparison against Part A.
+
+**Decision:** Embedded search panel within ComparePartsPage.
+- Search bar + results list inline — no multi-page navigation
+- Search scoped to same manual (ManualId) to keep results relevant
+- Part A always visible for context
+- Swap/Change buttons allow iteration without navigation
+
+**Comparison Engine:**
+- 9-field side-by-side layout: Model, Year, Engine, Transmission, Supplier, Cost, Weight, Availability, Notes
+- Color-coding: Green (`#1A4CAF50`) for matching fields, Orange (`#1AFF9800`) for differences
+- Case-insensitive, whitespace-trimmed string comparison
+
+**Files Changed:**
+- `ViewModels/ComparePartsViewModel.cs` — new
+- `Views/ComparePartsPage.xaml` + `.xaml.cs` — new
+- `Converters/ValueConverters.cs` — CompareFieldBackgroundConverter
+- `App.xaml` — converter registration
+- `MauiProgram.cs` — DI registration
+- `AppShell.xaml.cs` — route registration
+- `ViewModels/PartDetailsViewModel.cs` — CompareCommand integrated
+
+**Validation:**
+- ✅ Build: 0 errors (maccatalyst)
+- ✅ Feature fully wired end-to-end
+- ✅ All Deckard Week 1 priorities now complete
+
+---
+
+### 2026-03-17T17:38:13Z: SemanticKernel Upgrade 1.54.0 → 1.73.0 + AI Service Hardening (IMPLEMENTED)
+**By:** Roy (Backend Dev)  
+**Status:** Completed  
+**Context:** Build warning: NU1904 — Microsoft.SemanticKernel.Core 1.54.0 has critical severity vulnerability (GHSA-2ww3-72rp-wpp4).
+
+**Decision:** Upgrade SemanticKernel to 1.73.0 (latest stable) + harden PartsAiService with resilience patterns.
+
+**Upgrade:**
+- Microsoft.SemanticKernel: 1.54.0 → 1.73.0 (minor version bump, backward compatible)
+- NU1904 vulnerability eliminated
+
+**Resilience:**
+- **Timeout:** 30s per LLM call
+- **Retries:** Up to 3 with exponential backoff
+  - 1st: 1s, 2nd: 3s, 3rd: 8s
+- **Scope:** Transient HTTP errors only (429, 502, 503, 504, 408)
+- **Implementation:** BCL-only (no external retry libraries)
+
+**Files Changed:**
+- `PartsCopilot.csproj` — version bump
+- `Services/PartsAiService.cs` — retry + timeout logic
+
+**Validation:**
+- ✅ `dotnet build -f net11.0-maccatalyst` — 0 errors, NU1904 gone
+- ✅ `dotnet test` — 72/72 tests passing
+- ✅ No breaking API changes (SK follows semver)
+
+**Impact:**
+- Rachael: SK kernel builder API unchanged
+- Pris: No UI impact
+- All: Vulnerability resolved, AI calls resilient
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus

@@ -1,23 +1,36 @@
 ---
-updated_at: 2026-03-17T17:09:58Z
-focus_area: Week 1 Parallel Execution
+updated_at: 2026-03-17T17:38:13Z
+focus_area: Week 1 Complete — Deckard Priorities Delivered
 active_issues: []
 ---
 
 # What We're Focused On
 
-**MauiDevFlow setup complete.** All three agents unblocked for Week 1 work.
+**All three Deckard Week 1 priorities delivered.**
 
-## Immediate Priorities
+## Delivered
 
-1. **Manual Viewer UI (Pris)** — Implement page/illustration navigation to replace placeholder OpenPageCommand alert
-2. **Test Suite Expansion (Roy)** — Extend xUnit coverage from PDF parsing to domain models and repositories  
-3. **Compare Parts Flow (Pris)** — Complete compare-to-parts interaction pattern on PartDetailsPage
+1. ✅ **Compare Parts Flow (Pris)** — Side-by-side 9-field comparison with embedded search, green/orange color-coding, swap/change buttons
+2. ✅ **SemanticKernel Upgrade + AI Resilience (Roy)** — 1.54.0 → 1.73.0 (NU1904 resolved), 30s timeout + 3x retry with backoff
+3. ✅ **AI Layer Implementation (Rachael)** — IPromptBuilder + PartsAiService with JSON-mode responses, API key config
+
+## Build Status
+
+- **Compiler:** 0 errors, NU1904 gone
+- **Tests:** 72/72 passing
+- **Platforms:** maccatalyst verified
+
+## Next Phase (Post Week 1)
+
+1. **Polish pass** — Refine existing features
+2. **Real PDF rendering** — Image-based or WebView approach (user-facing requirement)
+3. **Settings UI** — API key management, appearance preferences
+4. **Secondary domain models** — Advanced filtering, export functionality
 
 ## Team Status
 
-- **Pris (UI Dev):** Ready to start Manual Viewer UI
-- **Roy (Backend Dev):** Ready to start LegendEntry model + seed data
-- **Rachael (AI Dev):** Ready to start IPromptBuilder implementation
+- **Pris (UI Dev):** Ready for Week 2 polish + real PDF rendering
+- **Roy (Backend Dev):** Ready for additional domain models + export features
+- **Rachael (AI Dev):** Ready for AI prompt refinement + context expansion
 
-**Next Assessment:** 2026-03-20 (end of Week 1)
+**Next Assessment:** Post Week 1 priorities (2026-03-20 or later)

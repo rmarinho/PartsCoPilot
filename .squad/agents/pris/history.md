@@ -10,6 +10,57 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-17 — Week 1 Delivery: Compare Parts + AI Service Hardening — COMPLETED
+
+**Pris: Compare Parts Flow**
+- Built ComparePartsPage + ComparePartsViewModel for side-by-side part comparison
+- 9-field comparison: Model, Year, Engine, Transmission, Supplier, Cost, Weight, Availability, Notes
+- Green/orange color-coding for field matches/differences
+- Embedded search for Part B selection (scoped to same manual, excludes Part A)
+- Swap/Change buttons for user control without navigation away
+- Wired CompareCommand in PartDetailsViewModel
+- ✅ Build: 0 errors (maccatalyst), feature fully integrated
+
+**Roy: SemanticKernel Upgrade + AI Resilience**
+- Upgraded Microsoft.SemanticKernel 1.54.0 → 1.73.0 (NU1904 resolved)
+- Added 30s timeout per LLM call
+- Up to 3 retries with exponential backoff (1s, 3s, 8s) for transient HTTP errors (429, 502, 503, 504, 408)
+- BCL-only implementation (no Polly)
+- ✅ Build: 0 errors, 72/72 tests passing
+
+**All three Deckard Week 1 priorities now complete:**
+1. ✅ Compare Parts flow (Pris)
+2. ✅ SemanticKernel vulnerability + hardening (Roy)
+3. ✅ AI layer implementation (Rachael, prior session)
+
+---
+
+### Compare Parts Flow — COMPLETED
+
+**What was built:**
+- `ComparePartsPage.xaml` + `.xaml.cs` — side-by-side comparison view for two parts
+- `ComparePartsViewModel.cs` — receives Part A via navigation, provides in-page search to pick Part B
+- `CompareFieldBackgroundConverter` — color-codes comparison rows (green tint = match, orange tint = difference)
+- Registered route `compare-parts` in AppShell (detail route, same pattern as `part-details` and `manual-viewer`)
+- Registered VM + Page in DI (MauiProgram.cs)
+- Wired existing `CompareCommand` in `PartDetailsViewModel` to navigate to compare-parts with current part
+
+**UI approach:**
+- Part A shown as fixed card at top; Part B selected via in-page search
+- Search uses `IPartsRepository.SearchPartsAsync()` scoped to same manual; excludes Part A from results
+- After Part B selection, comparison table shows 9 fields side-by-side: Part #, Description, Model, Illustration, Section, Page, Quantity, Position, Remark
+- Each row background color-coded: green tint (#1A4CAF50) for matching fields, orange tint (#1AFF9800) for differences
+- Swap button lets user flip Part A/B; Change button clears Part B to search again
+- CollectionView for search results with tap-to-select; search triggered by Enter or button
+
+**Architecture notes:**
+- Navigation uses `IQueryAttributable` with `Part` (PartRecord) parameter — consistent with existing detail routes
+- VM depends only on `IPartsRepository` (no search service needed — `SearchPartsAsync` already does the job)
+- Comparison logic uses `NormalizedEqual` helper for case-insensitive/whitespace-trimmed string comparison
+- `NotifyComparisonChanged()` fires all computed property notifications when parts change
+
+**Build status:** ✅ 0 errors (Mac Catalyst net11.0)
+
 ### 2026-03-17 — Integration Points with Rachael & Roy
 - **Rachael's ManualNavigationService:** Now wired to both SearchViewModel and PartDetailsViewModel `OpenPageCommand`. When user taps "Open Page", the service navigates with page/illustration data.
 - **Roy's seed data (25 parts):** FavoritesPage and search results now populated by SeedDataService. UI queries IPartsRepository for all domain data.
