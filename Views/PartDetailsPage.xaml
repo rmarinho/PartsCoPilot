@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             x:Class="PartsCopilot.Views.PartDetailsPage"
+             x:DataType="vm:PartDetailsViewModel"
+             Title="Part Details">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <!-- Part Number Header -->
+            <Label Text="{Binding PartNumber}"
+                   FontSize="28" FontAttributes="Bold"
+                   SemanticProperties.HeadingLevel="Level1" />
+
+            <!-- Description -->
+            <Label Text="{Binding Description}"
+                   FontSize="18" TextColor="Gray" />
+
+            <!-- Details Card -->
+            <Border Padding="16" Stroke="Transparent"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+
+                    <!-- Position -->
+                    <Grid ColumnDefinitions="120,*" IsVisible="{Binding HasPosition}">
+                        <Label Text="Position" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Position}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Illustration -->
+                    <Grid ColumnDefinitions="120,*" IsVisible="{Binding HasIllustration}">
+                        <Label Text="Illustration" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Illustration}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Page -->
+                    <Grid ColumnDefinitions="120,*">
+                        <Label Text="Page" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding PageDisplay}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Quantity -->
+                    <Grid ColumnDefinitions="120,*" IsVisible="{Binding HasQuantity}">
+                        <Label Text="Quantity" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Quantity}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Model -->
+                    <Grid ColumnDefinitions="120,*" IsVisible="{Binding HasModel}">
+                        <Label Text="Model" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Model}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Section -->
+                    <Grid ColumnDefinitions="120,*" IsVisible="{Binding HasSection}">
+                        <Label Text="Section" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Section}" FontSize="14" />
+                    </Grid>
+
+                    <!-- Remark -->
+                    <VerticalStackLayout Spacing="4" IsVisible="{Binding HasRemark}">
+                        <Label Text="Remark" FontSize="13" TextColor="Gray" FontAttributes="Bold" />
+                        <Label Text="{Binding Remark}" FontSize="14" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Error -->
+            <Label Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+                   TextColor="Red" FontSize="14" />
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+
+                <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                        Command="{Binding ToggleFavoriteCommand}"
+                        FontSize="22"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        MinimumWidthRequest="44"
+                        SemanticProperties.Description="Toggle favorite" />
+
+                <Button Grid.Column="1"
+                        Text="📖 Open Page"
+                        Command="{Binding OpenPageCommand}"
+                        FontSize="14"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        MinimumWidthRequest="44"
+                        SemanticProperties.Description="Open manual page" />
+
+                <Button Grid.Column="2"
+                        Text="⚖️ Compare"
+                        Command="{Binding CompareCommand}"
+                        FontSize="14"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                        TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        MinimumWidthRequest="44"
+                        SemanticProperties.Description="Compare part" />
+
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

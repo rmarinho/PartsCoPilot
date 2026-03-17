@@ -6,9 +6,24 @@
     xmlns:views="clr-namespace:PartsCopilot.Views"
     Title="PartsCopilot">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate views:HomePage}"
-        Route="home" />
+    <TabBar>
+        <ShellContent
+            Title="Home"
+            Icon="{OnPlatform Default='🏠'}"
+            ContentTemplate="{DataTemplate views:HomePage}"
+            Route="home" />
+
+        <ShellContent
+            Title="Search"
+            Icon="{OnPlatform Default='🔍'}"
+            ContentTemplate="{DataTemplate views:SearchPage}"
+            Route="search" />
+
+        <ShellContent
+            Title="Favorites"
+            Icon="{OnPlatform Default='⭐'}"
+            ContentTemplate="{DataTemplate views:FavoritesPage}"
+            Route="favorites" />
+    </TabBar>
 
 </Shell>

@@ -43,3 +43,65 @@ public sealed record IllustrationGroup
     public required int StartPage { get; init; }
     public int? EndPage { get; init; }
 }
+
+/// <summary>
+/// A legend/applicability entry from the manual — captures model, engine,
+/// or transmission applicability notes tied to a specific illustration.
+/// </summary>
+public sealed record LegendEntry
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public required string ManualId { get; init; }
+    public required string Code { get; init; }
+    public required string Description { get; init; }
+    public string? Illustration { get; init; }
+    public string? ApplicableModels { get; init; }
+    public string? YearRange { get; init; }
+    public string? Notes { get; init; }
+}
+
+/// <summary>
+/// A vehicle type entry from the manual summary pages.
+/// </summary>
+public sealed record VehicleType
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public required string ManualId { get; init; }
+    public required string Code { get; init; }
+    public required string ModelName { get; init; }
+    public string? Variant { get; init; }
+    public int? YearFrom { get; init; }
+    public int? YearTo { get; init; }
+    public string? ChassisRange { get; init; }
+}
+
+/// <summary>
+/// An engine type entry from the manual summary pages.
+/// </summary>
+public sealed record EngineType
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public required string ManualId { get; init; }
+    public required string Code { get; init; }
+    public required string EngineName { get; init; }
+    public string? Displacement { get; init; }
+    public string? Power { get; init; }
+    public string? ApplicableModels { get; init; }
+    public int? YearFrom { get; init; }
+    public int? YearTo { get; init; }
+}
+
+/// <summary>
+/// A transmission type entry from the manual summary pages.
+/// </summary>
+public sealed record TransmissionType
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public required string ManualId { get; init; }
+    public required string Code { get; init; }
+    public required string TransmissionName { get; init; }
+    public string? Type { get; init; }
+    public string? ApplicableModels { get; init; }
+    public int? YearFrom { get; init; }
+    public int? YearTo { get; init; }
+}

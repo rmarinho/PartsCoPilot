@@ -2,9 +2,9 @@ using PartsCopilot.ViewModels;
 
 namespace PartsCopilot.Views;
 
-public partial class HomePage : ContentPage
+public partial class FavoritesPage : ContentPage
 {
-    public HomePage(HomeViewModel viewModel)
+    public FavoritesPage(FavoritesViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;
@@ -13,7 +13,7 @@ public partial class HomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (BindingContext is HomeViewModel vm)
-            await vm.LoadStateCommand.ExecuteAsync(null);
+        if (BindingContext is FavoritesViewModel vm)
+            await vm.LoadDataCommand.ExecuteAsync(null);
     }
 }

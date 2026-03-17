@@ -65,7 +65,7 @@
 
                 <!-- Search Button -->
                 <Button Text="🔍 Search Parts"
-                        Clicked="OnSearchClicked"
+                        Command="{Binding GoToSearchCommand}"
                         IsVisible="{Binding HasManual}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
                         TextColor="{AppThemeBinding Light=White, Dark=Black}"
