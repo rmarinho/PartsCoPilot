@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
              x:Class="PartsCopilot.Views.SearchPage"
              x:DataType="vm:SearchViewModel"
-             Title="Search Parts">
+             Title="Search Parts"
+             AutomationId="SearchPage">
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
 
@@ -15,29 +16,45 @@
                    ReturnCommand="{Binding SearchCommand}"
                    ReturnType="Search"
                    FontSize="16"
-                   ClearButtonVisibility="WhileEditing" />
+                   ClearButtonVisibility="WhileEditing"
+                   SemanticProperties.Description="Search input field"
+                   SemanticProperties.Hint="Enter a part number or description to search"
+                   AutomationId="SearchEntry" />
             <Button Grid.Column="1" Text="🔍"
                     Command="{Binding SearchCommand}"
                     Margin="8,0,0,0"
-                    WidthRequest="50" />
+                    WidthRequest="50"
+                    SemanticProperties.Description="Search"
+                    SemanticProperties.Hint="Execute the parts search"
+                    AutomationId="SearchButton" />
         </Grid>
 
         <!-- Filters -->
-        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,8">
+        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,8"
+                               SemanticProperties.Description="Search filters">
             <Picker Title="Model"
                     ItemsSource="{Binding AvailableModels}"
                     SelectedItem="{Binding SelectedModel}"
-                    WidthRequest="120" />
+                    WidthRequest="120"
+                    SemanticProperties.Description="Filter by vehicle model"
+                    SemanticProperties.Hint="Select a model to narrow search results"
+                    AutomationId="ModelFilterPicker" />
             <Picker Title="Year"
                     ItemsSource="{Binding AvailableYears}"
                     SelectedItem="{Binding SelectedYear}"
-                    WidthRequest="100" />
+                    WidthRequest="100"
+                    SemanticProperties.Description="Filter by year"
+                    SemanticProperties.Hint="Select a year to narrow search results"
+                    AutomationId="YearFilterPicker" />
             <Button Text="✕ Clear"
                     Command="{Binding ClearFiltersCommand}"
                     FontSize="12"
                     BackgroundColor="Transparent"
-                    TextColor="Gray"
-                    Padding="4" />
+                    TextColor="{AppThemeBinding Light={StaticResource GhostButtonText_Light}, Dark={StaticResource GhostButtonText_Dark}}"
+                    Padding="4"
+                    SemanticProperties.Description="Clear all filters"
+                    SemanticProperties.Hint="Removes model and year filter selections"
+                    AutomationId="ClearFiltersButton" />
         </HorizontalStackLayout>
 
         <!-- Results -->
@@ -47,29 +64,43 @@
             <ActivityIndicator IsRunning="{Binding IsSearching}"
                                IsVisible="{Binding IsSearching}"
                                HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center"
+                               SemanticProperties.Description="Loading search results"
+                               AutomationId="SearchLoadingIndicator" />
 
             <!-- No Results -->
             <VerticalStackLayout IsVisible="{Binding HasNoResults}"
-                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
-                <Label Text="No parts found" FontSize="18" HorizontalOptions="Center" />
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="8"
+                                 AutomationId="NoResultsPanel">
+                <Label Text="No parts found" FontSize="18" HorizontalOptions="Center"
+                       SemanticProperties.Description="No parts found for the search query"
+                       AutomationId="NoResultsTitle" />
                 <Label Text="Try a different search or adjust filters"
-                       FontSize="14" TextColor="Gray" HorizontalOptions="Center" />
+                       FontSize="14"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}"
+                       HorizontalOptions="Center"
+                       SemanticProperties.Description="Suggestion to refine the search"
+                       AutomationId="NoResultsHint" />
             </VerticalStackLayout>
 
             <!-- Error -->
             <Label Text="{Binding ErrorMessage}"
                    IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
-                   TextColor="Red" FontSize="14"
-                   VerticalOptions="Center" HorizontalOptions="Center" />
+                   TextColor="{AppThemeBinding Light={StaticResource ErrorText_Light}, Dark={StaticResource ErrorText_Dark}}"
+                   FontSize="14"
+                   VerticalOptions="Center" HorizontalOptions="Center"
+                   SemanticProperties.Description="Search error message"
+                   AutomationId="SearchErrorLabel" />
 
             <!-- Result List -->
             <CollectionView ItemsSource="{Binding Results}"
-                            IsVisible="{Binding HasResults}">
+                            IsVisible="{Binding HasResults}"
+                            AutomationId="SearchResultsList">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:SearchCandidateViewModel">
                         <Border Margin="0,4" Padding="12" Stroke="Transparent"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground_Light}, Dark={StaticResource CardBackground_Dark}}"
+                                AutomationId="SearchResultCard">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="8" />
                             </Border.StrokeShape>
@@ -85,27 +116,35 @@
                                        Text="{Binding PartNumber}"
                                        FontSize="16" FontAttributes="Bold"
                                        FontFamily="OpenSansRegular"
-                                       SemanticProperties.HeadingLevel="Level3" />
+                                       SemanticProperties.HeadingLevel="Level3"
+                                       SemanticProperties.Description="Part number" />
 
                                 <!-- Score Badge -->
                                 <Border Grid.Row="0" Grid.Column="1"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        Padding="6,2" Stroke="Transparent">
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryButtonBg_Light}, Dark={StaticResource PrimaryButtonBg_Dark}}"
+                                        Padding="6,2" Stroke="Transparent"
+                                        SemanticProperties.Description="Search relevance score">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="10" />
                                     </Border.StrokeShape>
-                                    <Label Text="{Binding Score}" TextColor="White" FontSize="11" />
+                                    <Label Text="{Binding Score}"
+                                           TextColor="{AppThemeBinding Light={StaticResource BadgeText_Light}, Dark={StaticResource BadgeText_Dark}}"
+                                           FontSize="11" />
                                 </Border>
 
                                 <!-- Description -->
                                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                        Text="{Binding Description}"
-                                       FontSize="14" TextColor="Gray" />
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}"
+                                       SemanticProperties.Description="Part description" />
 
                                 <!-- Metadata Row -->
                                 <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                                        Spacing="12" Margin="0,4,0,0">
-                                    <Label FontSize="12" TextColor="Gray">
+                                    <Label FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                                           SemanticProperties.Description="Illustration reference">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span Text="📋 " />
@@ -113,7 +152,9 @@
                                             </FormattedString>
                                         </Label.FormattedText>
                                     </Label>
-                                    <Label FontSize="12" TextColor="Gray">
+                                    <Label FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                                           SemanticProperties.Description="Manual page number">
                                         <Label.FormattedText>
                                             <FormattedString>
                                                 <Span Text="📄 p." />
@@ -121,19 +162,26 @@
                                             </FormattedString>
                                         </Label.FormattedText>
                                     </Label>
-                                    <Label FontSize="12" TextColor="Gray"
+                                    <Label FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
                                            Text="{Binding Quantity, StringFormat='Qty: {0}'}"
-                                           IsVisible="{Binding Quantity, Converter={StaticResource IsNotNullConverter}}" />
-                                    <Label FontSize="12" TextColor="Gray"
+                                           IsVisible="{Binding Quantity, Converter={StaticResource IsNotNullConverter}}"
+                                           SemanticProperties.Description="Quantity" />
+                                    <Label FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
                                            Text="{Binding Model}"
-                                           IsVisible="{Binding Model, Converter={StaticResource IsNotNullConverter}}" />
+                                           IsVisible="{Binding Model, Converter={StaticResource IsNotNullConverter}}"
+                                           SemanticProperties.Description="Vehicle model" />
                                 </HorizontalStackLayout>
 
                                 <!-- Match Reason -->
                                 <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                                        Text="{Binding MatchReason}"
-                                       FontSize="11" TextColor="Gray" FontAttributes="Italic"
-                                       Margin="0,2,0,0" />
+                                       FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                                       FontAttributes="Italic"
+                                       Margin="0,2,0,0"
+                                       SemanticProperties.Description="Why this part matched the search" />
 
                                 <!-- Action Buttons -->
                                 <HorizontalStackLayout Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
@@ -168,11 +216,19 @@
 
         <!-- Status Bar -->
         <HorizontalStackLayout Grid.Row="3" Spacing="12" Padding="0,8"
-                               IsVisible="{Binding HasResults}">
+                               IsVisible="{Binding HasResults}"
+                               SemanticProperties.Description="Search results summary"
+                               AutomationId="SearchStatusBar">
             <Label Text="{Binding TotalMatches, StringFormat='{0} results'}"
-                   FontSize="12" TextColor="Gray" />
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                   SemanticProperties.Description="Total number of results"
+                   AutomationId="ResultCountLabel" />
             <Label Text="{Binding SearchDuration}"
-                   FontSize="12" TextColor="Gray" />
+                   FontSize="12"
+                   TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                   SemanticProperties.Description="Search duration"
+                   AutomationId="SearchDurationLabel" />
         </HorizontalStackLayout>
 
     </Grid>
