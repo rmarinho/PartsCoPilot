@@ -10,6 +10,38 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-17 — Integration Points with Rachael & Roy
+- **Rachael's ManualNavigationService:** Now wired to both SearchViewModel and PartDetailsViewModel `OpenPageCommand`. When user taps "Open Page", the service navigates with page/illustration data.
+- **Roy's seed data (25 parts):** FavoritesPage and search results now populated by SeedDataService. UI queries IPartsRepository for all domain data.
+- **Roy's new models:** PartDetailsPage displays LegendEntry, VehicleType, EngineType, TransmissionType info in rich detail view.
+- **Roy's test suite:** ManualViewerViewModel's navigation is now covered by ManualNavigationServiceTests (GetPageAsync, GetIllustrationAsync). Roy's EdgeCaseTests validate idempotent seed data that powers Pris's UI.
+
+### 2026-03-17 — Manual Viewer Page (MVP) — COMPLETED
+
+**What was built:**
+- `ManualViewerPage.xaml` + `.xaml.cs` — full page viewer for PDF manual content
+- `ManualViewerViewModel.cs` — loads ManualPage from repository, supports prev/next navigation
+- Registered route `manual-viewer` in AppShell (detail route, same pattern as `part-details`)
+- Registered VM + Page in DI (MauiProgram.cs)
+- Wired `OpenPageCommand` in both `SearchViewModel` and `PartDetailsViewModel` to navigate to manual-viewer with ManualId/PageNumber/Illustration params (replaces DisplayAlert placeholder)
+
+**PDF rendering approach chosen: Text-based viewer (extracted content)**
+- ManualPage.RawText already stored in SQLite from PdfPig ingestion pipeline
+- No runtime PDF rendering needed — display extracted text in monospace font with styled container
+- Zero new NuGet dependencies added
+- Prev/next page navigation built into bottom bar
+- Header shows manual title, page indicator, illustration badge, section badge
+- Three states: loading (spinner), error (with Go Back), content (scrollable text)
+- Used `Border` instead of deprecated `Frame` for .NET 11 compatibility
+
+**Architecture notes:**
+- Navigation uses `IQueryAttributable` with dictionary params: ManualId (string), PageNumber (int), Illustration (string?)
+- VM queries `IPartsRepository.GetPageAsync()` and `GetManualAsync()` directly — ManualNavigationService not needed by VM since we navigate by ManualId+PageNumber
+- Page count from `ManualMetadata.PageCount` drives prev/next enable/disable
+- Route registered as detail route (not tab) — consistent with `part-details` pattern
+
+**Build status:** ✅ 0 errors (Mac Catalyst)
+
 ### 2025-07-16 — UI Enhancement Sprint
 
 **What was done:**

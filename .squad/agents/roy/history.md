@@ -10,6 +10,25 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-17 — Test Suite Expansion (28 → 72 tests) — COMPLETED
+
+**New test files added:**
+- `UserDataRepositoryTests.cs` — 12 tests: favorites CRUD (save, get, remove, upsert, ordering, isolation), search history (save, get, ordering, limit, empty state)
+- `ManualNavigationServiceTests.cs` — 14 tests: GetPageNumber, GetIllustrationGroup, GetPageAsync, GetIllustrationAsync, GetIllustrationGroupsForManualAsync, null argument handling (ArgumentNullException), missing data returns null/empty, case-insensitive illustration lookup
+- `EdgeCaseTests.cs` — 18 tests: empty/whitespace search, special characters (slash, dash, unicode, SQL injection), case-insensitive search, ManualId filtering, SeedDataService idempotency (SeedAsync called twice = no duplicates), exact seed table counts, SeedIfEmpty skip when data exists, repository null/missing key handling, VehicleContext edge cases
+
+**Issues found & addressed:**
+- Seed data actually creates 26 parts (not 25 as documented in ManualMetadata.PartCount) — 5+6+5+5+5 across illustration groups
+- Empty string search (`""`) matches all parts via `Contains("")` — documented as expected behavior, not a bug (caller should validate)
+- Source file linking added for `UserDataRepository.cs` and `ManualNavigationService.cs` in test csproj
+
+**Final count: 72 passing tests, 0 failures.**
+
+**Cross-team coverage:**
+- ManualNavigationServiceTests now validates page/illustration navigation used by Pris's ManualViewerViewModel
+- UserDataRepositoryTests covers favorites and search history that underpin Pris's FavoritesPage and SearchPage
+- EdgeCaseTests ensures robustness of seed data that populates all Pris UI screens
+
 ### 2026-03-17 — Backend Hardening Sprint
 
 **Models added:**

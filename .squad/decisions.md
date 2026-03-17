@@ -103,6 +103,47 @@
 
 ---
 
+### 2026-03-17T17:17:02Z: User directive — Always validate implementation
+**By:** Rui Marinho (via Copilot)  
+**What:** Always validate that everything works when implementing something — make sure builds pass and changes are verified.  
+**Why:** User request — captured for team memory.
+
+---
+
+### 2026-03-17T17:24:04Z: Manual Viewer — Text-Based Rendering for MVP (IMPLEMENTED)
+**By:** Pris (UI Dev)  
+**Status:** Implemented  
+**Context:** Users need to view actual manual pages when they tap "Open Page" on a part. The app uses PdfPig for ingestion but PdfPig is an extraction library, not a renderer — it cannot produce page images.
+
+**Options Considered:**
+1. Text-based viewer (extracted content) — Display `ManualPage.RawText` from SQLite
+2. Image-based (pre-render pages) — Render PDF pages to images at import time
+3. WebView-based PDF viewer — Load PDF in a WebView using pdf.js
+4. Third-party MAUI PDF viewer — e.g., Syncfusion, DevExpress
+
+**Decision:** **Option 1: Text-based viewer.** The extracted text is already in the database from the ingestion pipeline. This approach:
+- Adds zero new dependencies (no NuGet packages, no JS libraries)
+- Works cross-platform with no platform-specific code
+- Is fast — text from SQLite is instant vs. loading/rendering PDF files
+- Supports prev/next page navigation naturally
+- Displays illustration and section metadata alongside content
+
+**Trade-offs:**
+- No visual fidelity — diagrams/illustrations from the original PDF are not shown
+- Layout not preserved — tabular data may not align perfectly in plain text
+
+**When to revisit:** When users request diagram viewing or lightweight MAUI PDF renderer becomes available. Option 2 (pre-rendered images at import) would be the natural next step.
+
+**Files Changed:**
+- `ViewModels/ManualViewerViewModel.cs` — new
+- `Views/ManualViewerPage.xaml` + `.xaml.cs` — new
+- `MauiProgram.cs` — DI registration
+- `AppShell.xaml.cs` — route registration
+- `ViewModels/SearchViewModel.cs` — OpenPage wired to navigation
+- `ViewModels/PartDetailsViewModel.cs` — OpenPage wired to navigation
+
+---
+
 ### 2026-03-17T17:09:58Z: Development tooling — Enable MauiDevFlow for remote debugging
 **By:** Pris (UI Dev)  
 **What:** Integrated MauiDevFlow v0.23.1 (`Redth.MauiDevFlow.Agent`) into PartsCopilot for remote app debugging and visual inspection during development.  
