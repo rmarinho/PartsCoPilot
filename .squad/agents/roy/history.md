@@ -105,3 +105,31 @@
 **Files changed:**
 - `PartsCopilot.csproj` — SK version bump
 - `Services/PartsAiService.cs` — retry loop, timeout, transient detection
+
+### 2026-03-17 — CI Workflow Setup — COMPLETED
+
+**Created `.github/workflows/ci.yml`** with two parallel jobs:
+
+1. **Build & Test (macOS job):**
+   - .NET 11 preview SDK via `setup-dotnet` with `include-prerelease: true`
+   - Full MAUI workload install
+   - Build for `net11.0-maccatalyst` (validates all shared code)
+   - Run 72 xUnit tests (test project targets plain `net11.0`)
+   - NuGet cache via `actions/cache@v4`
+
+2. **Build Android (Ubuntu job):**
+   - .NET 11 preview + `maui-android` workload only (lighter install)
+   - Build for `net11.0-android`
+   - Separate NuGet cache keyed by OS
+
+**Key decisions:**
+- No `global.json` exists — using `dotnet-version: '11.0.x'` with prerelease flag
+- Android job uses `maui-android` workload (not full `maui`) since only Android TFM needed on Linux
+- Tests run in the macOS job only (test project is plain `net11.0`, no MAUI dependency)
+- Existing squad workflows left untouched
+
+**Triggers:** push to `main`, PRs targeting `main`
+
+**Status:** ✅ Committed as f5d8e4e, ready for first CI run
+
+**Decision merged to:** `.squad/decisions.md` (2026-03-17T18:13:09Z)

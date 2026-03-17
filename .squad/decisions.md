@@ -237,6 +237,83 @@
 
 ---
 
+---
+
+### 2026-03-17T18:13:09Z: Production Backlog Decomposition — 25 Issues (IMPLEMENTED)
+**By:** Deckard (Lead)  
+**Status:** Completed  
+**Context:** Deep analysis of entire codebase to identify all remaining work for production readiness.
+
+**Summary:** 25 GitHub issues created covering all gaps between current state and production-ready app.
+
+**Priority Breakdown:**
+| Priority | Count | Theme |
+|----------|-------|-------|
+| P0 | 2 | Security + data correctness (must fix before any release) |
+| P1 | 8 | Core quality: PDF rendering, accessibility, testing, docs, API key management |
+| P2 | 10 | Polish: dark mode, localization, caching, error handling, validation |
+| P3 | 5 | Future: platform testing, rate limiting, integration tests, distribution |
+
+**Execution Order:**
+1. **Sprint 1 (P0 + Critical P1):** Prompt injection, N+1 queries, parser bugs, settings page, README
+2. **Sprint 2 (Quality P1):** Database migrations, VM tests, accessibility, dark mode, PDF rendering, AI context
+3. **Sprint 3 (Polish P2):** Pagination, error handling, caching, validation, search filters, localization
+4. **Sprint 4 (Ship P3):** Platform testing, rate limiting, integration tests, distribution
+
+**Team Load:**
+- Roy: 14 issues (data layer, testing, backend hardening)
+- Pris: 14 issues (UI polish, accessibility, new pages)
+- Rachael: 5 issues (AI quality, security, context management)
+- Deckard: 3 issues (README, distribution, oversight)
+
+**Key Decisions:**
+1. P0s are blockers — no feature work until resolved
+2. Settings page gates real-user testing
+3. README gates open-source readiness
+4. PDF rendering is the biggest single effort
+5. CI/CD excluded per task scope
+
+**Risks:**
+- PDF rendering library choice has major implications
+- Database migration system needed before schema changes
+- Parser bugs may affect existing seed data
+
+---
+
+### 2026-03-17T18:13:09Z: CI Workflow Architecture — GitHub Actions (IMPLEMENTED)
+**By:** Roy (Backend Dev)  
+**Status:** Completed  
+**Context:** Project needed GitHub Actions CI pipeline for .NET 11 preview SDK with Mac Catalyst and Android targets.
+
+**Architecture:**
+1. **Two-job split:** Mac Catalyst build + tests on macOS; Android build on Ubuntu
+   - macOS runners expensive, Ubuntu cheaper for Android-only builds
+2. **Tests on macOS only:** `net11.0` tests platform-agnostic; one pass sufficient
+3. **Minimal workloads:** `maui-android` on Linux (avoids iOS/Mac Catalyst bits that can't build there)
+4. **No global.json pinning:** Using `dotnet-version: '11.0.x'` with `include-prerelease: true`
+5. **OS-specific NuGet cache:** Cache keyed by OS + csproj hash for efficiency
+
+**Configuration:**
+- Triggers: push + pull_request (main/develop)
+- Cache invalidates on `.csproj` changes
+- Parallel job execution for speed
+- Artifact retention for diagnostics
+
+**Files:**
+- `.github/workflows/ci.yml` — new
+
+**Status:**
+- ✅ Workflow created and committed (f5d8e4e)
+- ✅ Ready for first CI run
+- ⚠️ Note: Consider updating macOS job runner to `macos-latest` for production
+
+**Impact:**
+- All PRs and commits trigger automated builds
+- Test failures block merges (with branch protection)
+- NuGet cache reduces build time on repeats
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
