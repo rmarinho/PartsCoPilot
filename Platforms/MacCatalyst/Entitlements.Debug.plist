@@ -11,5 +11,8 @@
         <!-- Allow incoming network connections for MauiDevFlow agent -->
         <key>com.apple.security.network.server</key>
         <true/>
+        <!-- Allow FilePicker to access user-selected files -->
+        <key>com.apple.security.files.user-selected.read-only</key>
+        <true/>
     </dict>
 </plist>
