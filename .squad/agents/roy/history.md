@@ -10,6 +10,29 @@
 
 <!-- Append learnings below -->
 
+### 2026-03-17 — CI Workflow Fix (Both Infrastructure Issues) — COMPLETED
+
+**Problem:** All 6 open PRs failing CI for two root causes on `main`.
+
+**Fix 1 — Test files compiled in main project (Android build CS0246):**
+- MAUI SDK default globbing (`**/*.cs`) pulled `tests/` into main project compilation
+- Added `<Compile Remove="tests/**" />` and `<None Remove="tests/**" />` to `PartsCopilot.csproj`
+- Verified: Android build succeeds with 0 errors
+
+**Fix 2 — Xcode 26.2 not available (Mac Catalyst build):**
+- .NET 11 preview requires Xcode 26.2, no GitHub runner has it yet
+- Replaced macOS Mac Catalyst build job with lightweight Ubuntu test-only job
+- Test project targets plain `net11.0` (no platform TFM, no Xcode needed)
+- Android build job unchanged — validates platform build on Ubuntu
+
+**CI structure now:**
+1. `test` job (Ubuntu): `dotnet test tests/PartsCopilot.Tests/` — validates logic
+2. `build-android` job (Ubuntu): `dotnet build -f net11.0-android` — validates platform build
+
+**Commit:** 5993a5d pushed to `main`. All 6 PRs can now rebase and pass CI.
+
+---
+
 ### 2026-03-17 — Week 1 Delivery: SemanticKernel Upgrade + AI Resilience — COMPLETED
 
 **Upgrade: Microsoft.SemanticKernel 1.54.0 → 1.73.0**
