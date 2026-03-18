@@ -73,13 +73,19 @@
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="8" />
                             </Border.StrokeShape>
-                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, Path=ViewPartDetailsCommand}"
+                                    CommandParameter="{Binding}" />
+                            </Border.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
 
                                 <!-- Part Number -->
                                 <Label Grid.Row="0" Grid.Column="0"
                                        Text="{Binding PartNumber}"
                                        FontSize="16" FontAttributes="Bold"
-                                       FontFamily="OpenSansRegular" />
+                                       FontFamily="OpenSansRegular"
+                                       SemanticProperties.HeadingLevel="Level3" />
 
                                 <!-- Score Badge -->
                                 <Border Grid.Row="0" Grid.Column="1"
@@ -128,6 +134,31 @@
                                        Text="{Binding MatchReason}"
                                        FontSize="11" TextColor="Gray" FontAttributes="Italic"
                                        Margin="0,2,0,0" />
+
+                                <!-- Action Buttons -->
+                                <HorizontalStackLayout Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                                                       Spacing="8" Margin="0,8,0,0">
+                                    <Button Text="{Binding IsFavorite, Converter={StaticResource BoolToFavoriteIconConverter}}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, Path=ToggleFavoriteCommand}"
+                                            CommandParameter="{Binding}"
+                                            FontSize="18"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                                            Padding="8,4"
+                                            MinimumWidthRequest="44"
+                                            MinimumHeightRequest="44"
+                                            SemanticProperties.Description="Toggle favorite" />
+                                    <Button Text="📖 Open Page"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SearchViewModel}}, Path=OpenPageCommand}"
+                                            CommandParameter="{Binding}"
+                                            FontSize="12"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
+                                            Padding="8,4"
+                                            MinimumWidthRequest="44"
+                                            MinimumHeightRequest="44"
+                                            SemanticProperties.Description="Open manual page" />
+                                </HorizontalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>

@@ -58,36 +58,50 @@ public class PartsRepository : IPartsRepository
         return entity?.ToDomain();
     }
 
-    public async Task<IReadOnlyList<PartRecord>> SearchPartsAsync(string query, string? manualId = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PartRecord>> SearchPartsAsync(string query, string? manualId = null, int pageSize = 100, int offset = 0, CancellationToken ct = default)
     {
         var normalized = query.Replace(" ", "").ToLowerInvariant();
         var lower = query.ToLowerInvariant();
 
-        // Try exact part number match first
-        var exactMatches = await _db.Connection.Table<PartEntity>()
-            .Where(p => p.PartNumberNormalized == normalized)
-            .ToListAsync();
-
-        if (exactMatches.Count > 0)
+        // Try exact part number match first — fully at SQL level
+        List<PartEntity> exactMatches;
+        if (manualId is not null)
         {
-            if (manualId is not null)
-                exactMatches = exactMatches.Where(p => p.ManualId == manualId).ToList();
-            return exactMatches.Select(e => e.ToDomain()).ToList();
+            exactMatches = await _db.Connection.QueryAsync<PartEntity>(
+                "SELECT * FROM Parts WHERE PartNumberNormalized = ? AND ManualId = ? LIMIT ? OFFSET ?",
+                normalized, manualId, pageSize, offset);
+        }
+        else
+        {
+            exactMatches = await _db.Connection.QueryAsync<PartEntity>(
+                "SELECT * FROM Parts WHERE PartNumberNormalized = ? LIMIT ? OFFSET ?",
+                normalized, pageSize, offset);
         }
 
-        // Fall back to text search
-        var allParts = manualId is not null
-            ? await _db.Connection.Table<PartEntity>().Where(p => p.ManualId == manualId).ToListAsync()
-            : await _db.Connection.Table<PartEntity>().ToListAsync();
+        if (exactMatches.Count > 0)
+            return exactMatches.Select(e => e.ToDomain()).ToList();
 
-        var results = allParts
-            .Where(p => p.SearchText.Contains(lower) || p.Description.ToLowerInvariant().Contains(lower))
-            .Take(100)
-            .Select(e => e.ToDomain())
-            .ToList();
+        // Fall back to text search — SQL LIKE, no in-memory filtering
+        var likePattern = $"%{EscapeLike(lower)}%";
+        List<PartEntity> results;
+        if (manualId is not null)
+        {
+            results = await _db.Connection.QueryAsync<PartEntity>(
+                "SELECT * FROM Parts WHERE ManualId = ? AND (SearchText LIKE ? ESCAPE '\\' OR LOWER(Description) LIKE ? ESCAPE '\\') LIMIT ? OFFSET ?",
+                manualId, likePattern, likePattern, pageSize, offset);
+        }
+        else
+        {
+            results = await _db.Connection.QueryAsync<PartEntity>(
+                "SELECT * FROM Parts WHERE SearchText LIKE ? ESCAPE '\\' OR LOWER(Description) LIKE ? ESCAPE '\\' LIMIT ? OFFSET ?",
+                likePattern, likePattern, pageSize, offset);
+        }
 
-        return results;
+        return results.Select(e => e.ToDomain()).ToList();
     }
+
+    private static string EscapeLike(string value)
+        => value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 
     public async Task SavePagesAsync(IReadOnlyList<ManualPage> pages, CancellationToken ct = default)
     {
@@ -115,5 +129,77 @@ public class PartsRepository : IPartsRepository
             foreach (var e in entities)
                 conn.InsertOrReplace(e);
         });
+    }
+
+    public async Task SaveLegendEntriesAsync(IReadOnlyList<LegendEntry> entries, CancellationToken ct = default)
+    {
+        var entities = entries.Select(LegendEntryEntity.FromDomain).ToList();
+        await _db.Connection.RunInTransactionAsync(conn =>
+        {
+            foreach (var e in entities)
+                conn.InsertOrReplace(e);
+        });
+    }
+
+    public async Task<IReadOnlyList<LegendEntry>> GetLegendEntriesAsync(string manualId, CancellationToken ct = default)
+    {
+        var entities = await _db.Connection.Table<LegendEntryEntity>()
+            .Where(e => e.ManualId == manualId)
+            .ToListAsync();
+        return entities.Select(e => e.ToDomain()).ToList();
+    }
+
+    public async Task SaveVehicleTypesAsync(IReadOnlyList<VehicleType> types, CancellationToken ct = default)
+    {
+        var entities = types.Select(VehicleTypeEntity.FromDomain).ToList();
+        await _db.Connection.RunInTransactionAsync(conn =>
+        {
+            foreach (var e in entities)
+                conn.InsertOrReplace(e);
+        });
+    }
+
+    public async Task<IReadOnlyList<VehicleType>> GetVehicleTypesAsync(string manualId, CancellationToken ct = default)
+    {
+        var entities = await _db.Connection.Table<VehicleTypeEntity>()
+            .Where(e => e.ManualId == manualId)
+            .ToListAsync();
+        return entities.Select(e => e.ToDomain()).ToList();
+    }
+
+    public async Task SaveEngineTypesAsync(IReadOnlyList<EngineType> types, CancellationToken ct = default)
+    {
+        var entities = types.Select(EngineTypeEntity.FromDomain).ToList();
+        await _db.Connection.RunInTransactionAsync(conn =>
+        {
+            foreach (var e in entities)
+                conn.InsertOrReplace(e);
+        });
+    }
+
+    public async Task<IReadOnlyList<EngineType>> GetEngineTypesAsync(string manualId, CancellationToken ct = default)
+    {
+        var entities = await _db.Connection.Table<EngineTypeEntity>()
+            .Where(e => e.ManualId == manualId)
+            .ToListAsync();
+        return entities.Select(e => e.ToDomain()).ToList();
+    }
+
+    public async Task SaveTransmissionTypesAsync(IReadOnlyList<TransmissionType> types, CancellationToken ct = default)
+    {
+        var entities = types.Select(TransmissionTypeEntity.FromDomain).ToList();
+        await _db.Connection.RunInTransactionAsync(conn =>
+        {
+            foreach (var e in entities)
+                conn.InsertOrReplace(e);
+        });
+    }
+
+    public async Task<IReadOnlyList<TransmissionType>> GetTransmissionTypesAsync(string manualId, CancellationToken ct = default)
+    {
+        var entities = await _db.Connection.Table<TransmissionTypeEntity>()
+            .Where(e => e.ManualId == manualId)
+            .ToListAsync();
+        return entities.Select(e => e.ToDomain()).ToList();
     }
 }

@@ -12,6 +12,8 @@
             <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
             <converters:ProgressConverter x:Key="ProgressConverter" />
+            <converters:BoolToFavoriteIconConverter x:Key="BoolToFavoriteIconConverter" />
+            <converters:CompareFieldBackgroundConverter x:Key="CompareFieldBackgroundConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

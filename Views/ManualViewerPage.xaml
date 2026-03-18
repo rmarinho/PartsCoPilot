@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+    x:Class="PartsCopilot.Views.ManualViewerPage"
+    x:DataType="vm:ManualViewerViewModel"
+    Title="{Binding PageTitle}"
+    Shell.PresentationMode="Animated">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+        <!-- Header: manual title + illustration badge -->
+        <Border
+            Grid.Row="0"
+            BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+            Padding="16,12"
+            StrokeThickness="0">
+            <VerticalStackLayout Spacing="4">
+                <Label
+                    Text="{Binding ManualTitle}"
+                    FontSize="13"
+                    TextColor="White"
+                    Opacity="0.85"
+                    IsVisible="{Binding ManualTitle, Converter={StaticResource IsNotNullConverter}}" />
+                <HorizontalStackLayout Spacing="10">
+                    <Label
+                        Text="{Binding PageIndicator}"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        TextColor="White" />
+                    <Border
+                        BackgroundColor="#FFFFFF33"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="8,2"
+                        StrokeThickness="0"
+                        IsVisible="{Binding Illustration, Converter={StaticResource IsNotNullConverter}}">
+                        <Label
+                            Text="{Binding Illustration, StringFormat='Ill. {0}'}"
+                            FontSize="12"
+                            TextColor="White" />
+                    </Border>
+                    <Border
+                        BackgroundColor="#FFFFFF33"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="8,2"
+                        StrokeThickness="0"
+                        IsVisible="{Binding Section, Converter={StaticResource IsNotNullConverter}}">
+                        <Label
+                            Text="{Binding Section}"
+                            FontSize="12"
+                            TextColor="White" />
+                    </Border>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Content area -->
+        <Grid Grid.Row="1">
+
+            <!-- Loading state -->
+            <VerticalStackLayout
+                IsVisible="{Binding IsLoading}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Spacing="12">
+                <ActivityIndicator IsRunning="{Binding IsLoading}" />
+                <Label
+                    Text="Loading page..."
+                    HorizontalOptions="Center"
+                    FontSize="14"
+                    TextColor="{AppThemeBinding Light=Gray, Dark=LightGray}" />
+            </VerticalStackLayout>
+
+            <!-- Error state -->
+            <VerticalStackLayout
+                IsVisible="{Binding HasError}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Spacing="12"
+                Padding="24">
+                <Label
+                    Text="📄"
+                    FontSize="48"
+                    HorizontalOptions="Center" />
+                <Label
+                    Text="{Binding ErrorMessage}"
+                    HorizontalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    FontSize="16"
+                    TextColor="{AppThemeBinding Light=Gray, Dark=LightGray}" />
+                <Button
+                    Text="Go Back"
+                    Command="{Binding GoBackCommand}"
+                    HorizontalOptions="Center"
+                    Margin="0,8,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Page content -->
+            <ScrollView IsVisible="{Binding HasContent}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <!-- Page type badge -->
+                    <Border
+                        BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#333333}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="10,6"
+                        StrokeThickness="0"
+                        HorizontalOptions="Start"
+                        IsVisible="{Binding PageType, Converter={StaticResource IsNotNullConverter}}">
+                        <Label
+                            Text="{Binding PageType, StringFormat='Type: {0}'}"
+                            FontSize="12"
+                            TextColor="{AppThemeBinding Light=#666666, Dark=#AAAAAA}" />
+                    </Border>
+
+                    <!-- Raw text content in a styled container -->
+                    <Border
+                        BackgroundColor="{AppThemeBinding Light=#FAFAFA, Dark=#1E1E1E}"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="16"
+                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                        StrokeThickness="1">
+                        <Label
+                            Text="{Binding PageContent}"
+                            FontSize="14"
+                            FontFamily="Courier New"
+                            LineHeight="1.5"
+                            TextColor="{AppThemeBinding Light=#333333, Dark=#E0E0E0}" />
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- Bottom navigation bar -->
+        <Grid
+            Grid.Row="2"
+            ColumnDefinitions="*,Auto,*"
+            Padding="16,8"
+            BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#1A1A1A}">
+            <Button
+                Grid.Column="0"
+                Text="◀ Previous"
+                Command="{Binding GoToPreviousPageCommand}"
+                IsEnabled="{Binding CanGoBack}"
+                HorizontalOptions="Start"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                FontSize="14" />
+            <Label
+                Grid.Column="1"
+                Text="{Binding PageIndicator}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                FontSize="13"
+                TextColor="{AppThemeBinding Light=Gray, Dark=LightGray}" />
+            <Button
+                Grid.Column="2"
+                Text="Next ▶"
+                Command="{Binding GoToNextPageCommand}"
+                IsEnabled="{Binding CanGoForward}"
+                HorizontalOptions="End"
+                BackgroundColor="Transparent"
+                TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                FontSize="14" />
+        </Grid>
+    </Grid>
+
+</ContentPage>

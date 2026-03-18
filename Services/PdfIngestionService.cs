@@ -1,11 +1,15 @@
 using PartsCopilot.Models;
 using PartsCopilot.Services;
 using UglyToad.PdfPig;
+using UglyToad.PdfPig.Content;
 
 namespace PartsCopilot.Services;
 
 public class PdfIngestionService : IPdfIngestionService
 {
+    // Y-coordinate tolerance for grouping words into lines (PDF points)
+    private const double LineGroupingTolerance = 3.0;
+
     public Task<IReadOnlyList<ManualPage>> ExtractPagesAsync(string filePath, string manualId, CancellationToken ct = default)
     {
         return Task.Run(() =>
@@ -18,7 +22,7 @@ public class PdfIngestionService : IPdfIngestionService
             {
                 ct.ThrowIfCancellationRequested();
 
-                var text = string.Join(" ", page.GetWords().Select(w => w.Text));
+                var text = ExtractTextWithLines(page);
                 if (string.IsNullOrWhiteSpace(text))
                     continue;
 
@@ -37,6 +41,52 @@ public class PdfIngestionService : IPdfIngestionService
 
             return (IReadOnlyList<ManualPage>)pages;
         }, ct);
+    }
+
+    /// <summary>
+    /// Reconstructs line-separated text from PdfPig word positions.
+    /// Groups words by Y baseline into lines, sorts left-to-right within lines.
+    /// </summary>
+    private static string ExtractTextWithLines(UglyToad.PdfPig.Content.Page page)
+    {
+        var words = page.GetWords().ToList();
+        if (words.Count == 0)
+            return string.Empty;
+
+        // Group words by Y baseline (bottom of bounding box) with tolerance.
+        // PDF Y axis: 0 = bottom of page, increasing upward.
+        var lines = new List<(double Y, List<Word> Words)>();
+
+        foreach (var word in words)
+        {
+            var baseline = word.BoundingBox.Bottom;
+            var matched = false;
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (Math.Abs(lines[i].Y - baseline) <= LineGroupingTolerance)
+                {
+                    lines[i].Words.Add(word);
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched)
+                lines.Add((baseline, new List<Word> { word }));
+        }
+
+        // Sort lines top-to-bottom (highest Y first), words left-to-right within each line
+        lines.Sort((a, b) => b.Y.CompareTo(a.Y));
+
+        var sb = new System.Text.StringBuilder();
+        foreach (var line in lines)
+        {
+            line.Words.Sort((a, b) => a.BoundingBox.Left.CompareTo(b.BoundingBox.Left));
+            sb.AppendLine(string.Join(" ", line.Words.Select(w => w.Text)));
+        }
+
+        return sb.ToString();
     }
 
     private static string? DetectIllustration(string text)

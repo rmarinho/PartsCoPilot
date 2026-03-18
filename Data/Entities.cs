@@ -151,18 +151,136 @@ public class FavoriteEntity
     public string PartRecordId { get; set; } = "";
     public string PartNumber { get; set; } = "";
     public string Description { get; set; } = "";
+    public string? Model { get; set; }
+    public int PageNumber { get; set; }
+    public string? Illustration { get; set; }
     public string? ManualId { get; set; }
     public DateTime SavedAt { get; set; }
 
     public FavoriteEntry ToDomain() => new()
     {
         Id = Id, PartRecordId = PartRecordId, PartNumber = PartNumber,
-        Description = Description, ManualId = ManualId, SavedAt = SavedAt
+        Description = Description, Model = Model, PageNumber = PageNumber,
+        Illustration = Illustration, ManualId = ManualId, SavedAt = SavedAt
     };
 
     public static FavoriteEntity FromDomain(FavoriteEntry e) => new()
     {
         Id = e.Id, PartRecordId = e.PartRecordId, PartNumber = e.PartNumber,
-        Description = e.Description, ManualId = e.ManualId, SavedAt = e.SavedAt
+        Description = e.Description, Model = e.Model, PageNumber = e.PageNumber,
+        Illustration = e.Illustration, ManualId = e.ManualId, SavedAt = e.SavedAt
+    };
+}
+
+[Table("LegendEntries")]
+public class LegendEntryEntity
+{
+    [PrimaryKey] public string Id { get; set; } = "";
+    [Indexed] public string ManualId { get; set; } = "";
+    public string Code { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string? Illustration { get; set; }
+    public string? ApplicableModels { get; set; }
+    public string? YearRange { get; set; }
+    public string? Notes { get; set; }
+
+    public LegendEntry ToDomain() => new()
+    {
+        Id = Id, ManualId = ManualId, Code = Code,
+        Description = Description, Illustration = Illustration,
+        ApplicableModels = ApplicableModels, YearRange = YearRange, Notes = Notes
+    };
+
+    public static LegendEntryEntity FromDomain(LegendEntry e) => new()
+    {
+        Id = e.Id, ManualId = e.ManualId, Code = e.Code,
+        Description = e.Description, Illustration = e.Illustration,
+        ApplicableModels = e.ApplicableModels, YearRange = e.YearRange, Notes = e.Notes
+    };
+}
+
+[Table("VehicleTypes")]
+public class VehicleTypeEntity
+{
+    [PrimaryKey] public string Id { get; set; } = "";
+    [Indexed] public string ManualId { get; set; } = "";
+    public string Code { get; set; } = "";
+    public string ModelName { get; set; } = "";
+    public string? Variant { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
+    public string? ChassisRange { get; set; }
+
+    public VehicleType ToDomain() => new()
+    {
+        Id = Id, ManualId = ManualId, Code = Code,
+        ModelName = ModelName, Variant = Variant,
+        YearFrom = YearFrom, YearTo = YearTo, ChassisRange = ChassisRange
+    };
+
+    public static VehicleTypeEntity FromDomain(VehicleType v) => new()
+    {
+        Id = v.Id, ManualId = v.ManualId, Code = v.Code,
+        ModelName = v.ModelName, Variant = v.Variant,
+        YearFrom = v.YearFrom, YearTo = v.YearTo, ChassisRange = v.ChassisRange
+    };
+}
+
+[Table("EngineTypes")]
+public class EngineTypeEntity
+{
+    [PrimaryKey] public string Id { get; set; } = "";
+    [Indexed] public string ManualId { get; set; } = "";
+    public string Code { get; set; } = "";
+    public string EngineName { get; set; } = "";
+    public string? Displacement { get; set; }
+    public string? Power { get; set; }
+    public string? ApplicableModels { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
+
+    public EngineType ToDomain() => new()
+    {
+        Id = Id, ManualId = ManualId, Code = Code,
+        EngineName = EngineName, Displacement = Displacement,
+        Power = Power, ApplicableModels = ApplicableModels,
+        YearFrom = YearFrom, YearTo = YearTo
+    };
+
+    public static EngineTypeEntity FromDomain(EngineType e) => new()
+    {
+        Id = e.Id, ManualId = e.ManualId, Code = e.Code,
+        EngineName = e.EngineName, Displacement = e.Displacement,
+        Power = e.Power, ApplicableModels = e.ApplicableModels,
+        YearFrom = e.YearFrom, YearTo = e.YearTo
+    };
+}
+
+[Table("TransmissionTypes")]
+public class TransmissionTypeEntity
+{
+    [PrimaryKey] public string Id { get; set; } = "";
+    [Indexed] public string ManualId { get; set; } = "";
+    public string Code { get; set; } = "";
+    public string TransmissionName { get; set; } = "";
+    public string? Type { get; set; }
+    public string? ApplicableModels { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
+
+    public TransmissionType ToDomain() => new()
+    {
+        Id = Id, ManualId = ManualId, Code = Code,
+        TransmissionName = TransmissionName, Type = Type,
+        ApplicableModels = ApplicableModels,
+        YearFrom = YearFrom, YearTo = YearTo
+    };
+
+    public static TransmissionTypeEntity FromDomain(TransmissionType t) => new()
+    {
+        Id = t.Id, ManualId = t.ManualId, Code = t.Code,
+        TransmissionName = t.TransmissionName, Type = t.Type,
+        ApplicableModels = t.ApplicableModels,
+        YearFrom = t.YearFrom, YearTo = t.YearTo
     };
 }

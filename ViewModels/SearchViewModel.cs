@@ -6,7 +6,7 @@ using PartsCopilot.Services;
 
 namespace PartsCopilot.ViewModels;
 
-public partial class SearchViewModel : ObservableObject
+public partial class SearchViewModel : ObservableObject, IQueryAttributable
 {
     private readonly ISearchService _search;
     private readonly IPartsRepository _repo;
@@ -18,6 +18,15 @@ public partial class SearchViewModel : ObservableObject
         _search = search;
         _repo = repo;
         _userData = userData;
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("query", out var q) && q is string queryText && !string.IsNullOrWhiteSpace(queryText))
+        {
+            QueryText = queryText;
+            SearchCommand.Execute(null);
+        }
     }
 
     [ObservableProperty]
@@ -79,8 +88,13 @@ public partial class SearchViewModel : ObservableObject
 
             var result = await _search.SearchAsync(query, ct);
 
+            // Check favorite status for each result
             foreach (var candidate in result.Candidates)
-                Results.Add(new SearchCandidateViewModel(candidate));
+            {
+                var vm = new SearchCandidateViewModel(candidate);
+                vm.IsFavorite = await _userData.IsFavoriteAsync(candidate.Part.Id, ct);
+                Results.Add(vm);
+            }
 
             TotalMatches = result.TotalMatches;
             SearchDuration = $"{result.SearchDuration.TotalMilliseconds:F0}ms";
@@ -118,6 +132,69 @@ public partial class SearchViewModel : ObservableObject
         var manuals = await _repo.GetAllManualsAsync();
         var active = manuals.FirstOrDefault();
         ActiveManualTitle = active?.Title ?? "No manual imported";
+    }
+
+    [RelayCommand]
+    private async Task ToggleFavoriteAsync(SearchCandidateViewModel? item)
+    {
+        if (item is null) return;
+
+        try
+        {
+            if (item.IsFavorite)
+            {
+                await _userData.RemoveFavoriteAsync(item.Part.Id);
+                item.IsFavorite = false;
+            }
+            else
+            {
+                await _userData.SaveFavoriteAsync(new FavoriteEntry
+                {
+                    PartRecordId = item.Part.Id,
+                    PartNumber = item.PartNumber,
+                    Description = item.Description,
+                    Model = item.Model,
+                    PageNumber = item.PageNumber,
+                    Illustration = item.Illustration,
+                    ManualId = item.Part.ManualId,
+                });
+                item.IsFavorite = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenPageAsync(SearchCandidateViewModel? item)
+    {
+        if (item is null) return;
+
+        var parameters = new Dictionary<string, object>
+        {
+            ["ManualId"] = item.Part.ManualId,
+            ["PageNumber"] = item.PageNumber,
+        };
+        if (item.Illustration is not null)
+            parameters["Illustration"] = item.Illustration;
+
+        await Shell.Current.GoToAsync("manual-viewer", parameters);
+    }
+
+    [RelayCommand]
+    private async Task ViewPartDetailsAsync(SearchCandidateViewModel? item)
+    {
+        if (item is null) return;
+
+        var parameters = new Dictionary<string, object>
+        {
+            ["Part"] = item.Part,
+            ["IsFavorite"] = item.IsFavorite,
+        };
+
+        await Shell.Current.GoToAsync("part-details", parameters);
     }
 }
 

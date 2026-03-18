@@ -19,7 +19,7 @@ public class HybridSearchService : ISearchService
         var normalized = query.UserText.Replace(" ", "").ToUpperInvariant();
         var lower = query.UserText.ToLowerInvariant();
 
-        var parts = await _repo.SearchPartsAsync(query.UserText, query.ManualId, ct);
+        var parts = await _repo.SearchPartsAsync(query.UserText, query.ManualId, ct: ct);
 
         foreach (var part in parts)
         {

@@ -34,12 +34,24 @@ public interface IPartsRepository
     Task SavePartsAsync(IReadOnlyList<PartRecord> parts, CancellationToken ct = default);
     Task<IReadOnlyList<PartRecord>> GetPartsByManualAsync(string manualId, CancellationToken ct = default);
     Task<PartRecord?> GetPartAsync(string partId, CancellationToken ct = default);
-    Task<IReadOnlyList<PartRecord>> SearchPartsAsync(string query, string? manualId = null, CancellationToken ct = default);
+    Task<IReadOnlyList<PartRecord>> SearchPartsAsync(string query, string? manualId = null, int pageSize = 100, int offset = 0, CancellationToken ct = default);
 
     Task SavePagesAsync(IReadOnlyList<ManualPage> pages, CancellationToken ct = default);
     Task<ManualPage?> GetPageAsync(string manualId, int pageNumber, CancellationToken ct = default);
 
     Task SaveIllustrationGroupsAsync(IReadOnlyList<IllustrationGroup> groups, CancellationToken ct = default);
+
+    Task SaveLegendEntriesAsync(IReadOnlyList<LegendEntry> entries, CancellationToken ct = default);
+    Task<IReadOnlyList<LegendEntry>> GetLegendEntriesAsync(string manualId, CancellationToken ct = default);
+
+    Task SaveVehicleTypesAsync(IReadOnlyList<VehicleType> types, CancellationToken ct = default);
+    Task<IReadOnlyList<VehicleType>> GetVehicleTypesAsync(string manualId, CancellationToken ct = default);
+
+    Task SaveEngineTypesAsync(IReadOnlyList<EngineType> types, CancellationToken ct = default);
+    Task<IReadOnlyList<EngineType>> GetEngineTypesAsync(string manualId, CancellationToken ct = default);
+
+    Task SaveTransmissionTypesAsync(IReadOnlyList<TransmissionType> types, CancellationToken ct = default);
+    Task<IReadOnlyList<TransmissionType>> GetTransmissionTypesAsync(string manualId, CancellationToken ct = default);
 }
 
 /// <summary>
@@ -64,6 +76,17 @@ public interface IPromptBuilder
 public interface IPartsAiService
 {
     Task<AiAnswer> AskAsync(PromptContext context, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Maps part records to their source PDF pages and illustration groups.
+/// </summary>
+public interface IManualNavigationService
+{
+    int GetPageNumber(PartRecord part);
+    string? GetIllustrationGroup(PartRecord part);
+    Task<ManualPage?> GetPageAsync(PartRecord part, CancellationToken ct = default);
+    Task<IllustrationGroup?> GetIllustrationAsync(PartRecord part, CancellationToken ct = default);
 }
 
 /// <summary>
