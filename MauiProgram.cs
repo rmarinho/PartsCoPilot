@@ -30,14 +30,15 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new AppDatabase(dbPath));
 
 		// Services
-		builder.Services.AddSingleton<IPdfPageRenderer, PdfPageRenderer>();
-		builder.Services.AddSingleton<IPdfIngestionService>(sp =>
-			new PdfIngestionService(sp.GetService<IPdfPageRenderer>()));
+		builder.Services.AddSingleton<IPdfIngestionService, PdfIngestionService>();
 		builder.Services.AddSingleton<IManualParser, PorscheClassicManualParser>();
 		builder.Services.AddSingleton<IPartsRepository, PartsRepository>();
 		builder.Services.AddSingleton<ISearchService, HybridSearchService>();
 		builder.Services.AddSingleton<IUserDataRepository, UserDataRepository>();
 		builder.Services.AddSingleton<SeedDataService>();
+
+		// Settings (SecureStorage-backed)
+		builder.Services.AddSingleton<ISettingsService, SettingsService>();
 
 		// AI layer
 		builder.Services.AddSingleton<IPromptBuilder, PromptBuilder>();
@@ -62,6 +63,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<PartDetailsViewModel>();
 		builder.Services.AddTransient<ManualViewerViewModel>();
 		builder.Services.AddTransient<ComparePartsViewModel>();
+		builder.Services.AddTransient<SettingsViewModel>();
 
 		// Pages
 		builder.Services.AddTransient<HomePage>();
@@ -70,6 +72,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<PartDetailsPage>();
 		builder.Services.AddTransient<ManualViewerPage>();
 		builder.Services.AddTransient<ComparePartsPage>();
+		builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();
