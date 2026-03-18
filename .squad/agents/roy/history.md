@@ -264,3 +264,25 @@
 - Compare Parts flow: embedded search panel for Part B selection, 9-field side-by-side comparison
 - Shell restructure: Tab-based navigation (Home, Search, Favorites)
 - **Impact for Roy:** FavoriteEntry schema extended with Model, PageNumber, Illustration fields (Migration 3)
+
+## Session 3: ViewModel & Converter Unit Tests (#10)
+
+**Branch:** `squad/10-viewmodel-tests`
+**PR:** #34
+**Tests Added:** 95 new tests (282 total passing)
+
+### What Was Done
+- Created MAUI type shims (MauiShims.cs) to enable ViewModel/Converter source compilation in net11.0 test project
+- Added NSubstitute for interface mocking and CommunityToolkit.Mvvm for source generators
+- Wrote tests for all 6 ViewModels: Search (16), Compare (17), Favorites (12), ManualViewer (13), PartDetails (9), Home (4)
+- Wrote tests for all 5 ValueConverters (24 tests total)
+- Fixed duplicate type definitions in AppModels.cs (LegendEntry, VehicleType, EngineType, TransmissionType canonicalized in ManualModels.cs)
+- Fixed duplicate FavoriteEntry properties (merge artifact from Pris's schema extension)
+- Fixed entity property name mismatches in MigrationSystemTests.cs
+
+### Learnings
+- **MAUI shims approach works well**: Minimal type stubs in correct namespaces let linked source files compile without the full MAUI workload
+- **Source file linking requires both files to agree on types**: When two files define the same type with different property names, the test project fails with CS0101/CS0102
+- **Concurrent agent interference is a major challenge**: Other agents repeatedly deleted files and switched branches. Workaround: use Python to write files atomically and git add immediately
+- **CommunityToolkit.Mvvm source generators work in net11.0**: No MAUI workload needed; the NuGet package provides everything
+- **NSubstitute.ExceptionExtensions**: Use `.Throws()` not `.ThrowsAsync()` for configuring mock exceptions
