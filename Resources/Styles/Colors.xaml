@@ -41,4 +41,49 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+
+    <!-- ============================================================
+         App-level theme-aware semantic colors (Light / Dark)
+         Used via AppThemeBinding in XAML pages.
+         ============================================================ -->
+
+    <!-- Page / surface backgrounds -->
+    <Color x:Key="PageBackground_Light">White</Color>
+    <Color x:Key="PageBackground_Dark">#1A1A2E</Color>
+
+    <Color x:Key="CardBackground_Light">#F5F5F5</Color>
+    <Color x:Key="CardBackground_Dark">#2A2A3E</Color>
+
+    <!-- Text -->
+    <Color x:Key="TextPrimary_Light">#1B1B1B</Color>
+    <Color x:Key="TextPrimary_Dark">#ECECEC</Color>
+
+    <Color x:Key="TextSecondary_Light">#6E6E6E</Color>
+    <Color x:Key="TextSecondary_Dark">#A0A0B0</Color>
+
+    <Color x:Key="TextMuted_Light">#919191</Color>
+    <Color x:Key="TextMuted_Dark">#787890</Color>
+
+    <!-- Semantic: error / badge / link -->
+    <Color x:Key="ErrorText_Light">#D32F2F</Color>
+    <Color x:Key="ErrorText_Dark">#EF5350</Color>
+
+    <Color x:Key="BadgeText_Light">White</Color>
+    <Color x:Key="BadgeText_Dark">#1B1B1B</Color>
+
+    <!-- Buttons: primary CTA overrides (import button) -->
+    <Color x:Key="PrimaryButtonBg_Light">#512BD4</Color>
+    <Color x:Key="PrimaryButtonBg_Dark">#7C5AFF</Color>
+    <Color x:Key="PrimaryButtonText_Light">White</Color>
+    <Color x:Key="PrimaryButtonText_Dark">White</Color>
+
+    <!-- Buttons: secondary / inverted (search button on home) -->
+    <Color x:Key="SecondaryButtonBg_Light">#212121</Color>
+    <Color x:Key="SecondaryButtonBg_Dark">#E1E1E1</Color>
+    <Color x:Key="SecondaryButtonText_Light">White</Color>
+    <Color x:Key="SecondaryButtonText_Dark">#1B1B1B</Color>
+
+    <!-- Buttons: ghost / clear-filter -->
+    <Color x:Key="GhostButtonText_Light">#6E6E6E</Color>
+    <Color x:Key="GhostButtonText_Dark">#A0A0B0</Color>
 </ResourceDictionary>

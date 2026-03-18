@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
              x:Class="PartsCopilot.Views.HomePage"
              x:DataType="vm:HomeViewModel"
-             Title="PartsCopilot">
+             Title="PartsCopilot"
+             AutomationId="HomePage">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20">
 
@@ -12,10 +13,17 @@
         <VerticalStackLayout Grid.Row="0" Spacing="8" Padding="0,20,0,20">
             <Label Text="🔧 PartsCopilot"
                    FontSize="28" FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+                   HorizontalOptions="Center"
+                   SemanticProperties.HeadingLevel="Level1"
+                   SemanticProperties.Description="PartsCopilot application title"
+                   AutomationId="HomeTitle" />
             <Label Text="AI-Assisted Parts Finder"
-                   FontSize="16" TextColor="Gray"
-                   HorizontalOptions="Center" />
+                   FontSize="16"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}"
+                   HorizontalOptions="Center"
+                   SemanticProperties.HeadingLevel="Level2"
+                   SemanticProperties.Description="AI-Assisted Parts Finder subtitle"
+                   AutomationId="HomeSubtitle" />
         </VerticalStackLayout>
 
         <!-- Content -->
@@ -23,19 +31,30 @@
             <VerticalStackLayout Spacing="20" Padding="0,10">
 
                 <!-- Manual Status Card -->
-                <Border BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                        Padding="20" Stroke="Transparent">
+                <Border BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground_Light}, Dark={StaticResource CardBackground_Dark}}"
+                        Padding="20" Stroke="Transparent"
+                        AutomationId="ManualStatusCard"
+                        SemanticProperties.Description="Active manual status">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="12" />
                     </Border.StrokeShape>
                     <VerticalStackLayout Spacing="10">
                         <Label Text="Active Manual"
-                               FontSize="14" TextColor="Gray" FontAttributes="Bold" />
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}"
+                               FontAttributes="Bold"
+                               SemanticProperties.HeadingLevel="Level3"
+                               AutomationId="ManualStatusLabel" />
                         <Label Text="{Binding ActiveManualTitle, FallbackValue='No manual imported'}"
-                               FontSize="18" FontAttributes="Bold" />
+                               FontSize="18" FontAttributes="Bold"
+                               SemanticProperties.Description="Name of the currently active manual"
+                               AutomationId="ActiveManualTitle" />
                         <Label Text="{Binding TotalParts, StringFormat='{0} parts indexed'}"
-                               FontSize="14" TextColor="Gray"
-                               IsVisible="{Binding HasManual}" />
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}"
+                               IsVisible="{Binding HasManual}"
+                               SemanticProperties.Description="Number of parts indexed from the manual"
+                               AutomationId="TotalPartsLabel" />
                     </VerticalStackLayout>
                 </Border>
 
@@ -43,43 +62,60 @@
                 <Button Text="📄 Import Parts Manual (PDF)"
                         Command="{Binding ImportManualCommand}"
                         IsEnabled="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}"
-                        BackgroundColor="{StaticResource Primary}"
-                        TextColor="White"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryButtonBg_Light}, Dark={StaticResource PrimaryButtonBg_Dark}}"
+                        TextColor="{AppThemeBinding Light={StaticResource PrimaryButtonText_Light}, Dark={StaticResource PrimaryButtonText_Dark}}"
                         CornerRadius="8"
                         HeightRequest="50"
-                        FontSize="16" />
+                        FontSize="16"
+                        SemanticProperties.Description="Import a PDF parts manual"
+                        SemanticProperties.Hint="Opens file picker to select a PDF manual for import"
+                        AutomationId="ImportManualButton" />
 
                 <!-- Import Progress -->
                 <VerticalStackLayout Spacing="8" IsVisible="{Binding IsImporting}">
-                    <ProgressBar Progress="{Binding ImportProgress, Converter={StaticResource ProgressConverter}}" />
+                    <ProgressBar Progress="{Binding ImportProgress, Converter={StaticResource ProgressConverter}}"
+                                 SemanticProperties.Description="Manual import progress"
+                                 AutomationId="ImportProgressBar" />
                     <Label Text="{Binding ImportStatus}"
-                           FontSize="13" TextColor="Gray"
-                           HorizontalOptions="Center" />
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                           HorizontalOptions="Center"
+                           SemanticProperties.Description="Import progress status message"
+                           AutomationId="ImportProgressStatus" />
                 </VerticalStackLayout>
 
                 <!-- Import Status (when not importing) -->
                 <Label Text="{Binding ImportStatus}"
-                       FontSize="13" TextColor="Gray"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
                        HorizontalOptions="Center"
-                       IsVisible="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}" />
+                       IsVisible="{Binding IsImporting, Converter={StaticResource InvertedBoolConverter}}"
+                       SemanticProperties.Description="Import status message"
+                       AutomationId="ImportIdleStatus" />
 
                 <!-- Search Button -->
                 <Button Text="🔍 Search Parts"
                         Command="{Binding GoToSearchCommand}"
                         IsVisible="{Binding HasManual}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"
-                        TextColor="{AppThemeBinding Light=White, Dark=Black}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryButtonBg_Light}, Dark={StaticResource SecondaryButtonBg_Dark}}"
+                        TextColor="{AppThemeBinding Light={StaticResource SecondaryButtonText_Light}, Dark={StaticResource SecondaryButtonText_Dark}}"
                         CornerRadius="8"
                         HeightRequest="50"
-                        FontSize="16" />
+                        FontSize="16"
+                        SemanticProperties.Description="Search parts in the imported manual"
+                        SemanticProperties.Hint="Navigate to the parts search page"
+                        AutomationId="SearchPartsButton" />
 
             </VerticalStackLayout>
         </ScrollView>
 
         <!-- Footer -->
         <Label Grid.Row="2" Text="Classic vehicle parts catalog assistant"
-               FontSize="12" TextColor="Gray"
-               HorizontalOptions="Center" Padding="0,10" />
+               FontSize="12"
+               TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+               HorizontalOptions="Center" Padding="0,10"
+               SemanticProperties.Description="App tagline"
+               AutomationId="FooterLabel" />
     </Grid>
 
 </ContentPage>
