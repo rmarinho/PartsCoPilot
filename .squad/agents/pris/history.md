@@ -162,3 +162,28 @@
 **Build:** ✅ 0 errors (maccatalyst), only pre-existing MAUIG2045 warnings
 **Branch:** squad/5-8-accessibility-dark-mode
 **PR:** #29
+
+---
+
+### PR #33 — PDF Page Rendering in Manual Viewer (#3)
+**Date:** 2025-07-18
+**Issue:** #3 — Render actual PDF pages (not raw text)
+
+**What I did:**
+- Added PDFtoImage (PDFium wrapper) to pre-render PDF pages to PNG at import time
+- Extended ManualPage/PageEntity with ImageData byte[] + migration 4
+- Created PdfPageRenderer service with PDFium availability probing
+- Updated ManualViewerPage with image display, pinch-to-zoom (1x-5x), pan, double-tap
+- Added view mode toggle (image/text) with graceful fallback
+- Fixed pre-existing duplicate type definitions in AppModels.cs
+
+**Build:** ✅ 0 errors (maccatalyst), 187/188 tests pass (1 pre-existing failure)
+**Branch:** squad/3-pdf-page-rendering
+**PR:** #33
+
+## Learnings
+
+- **Branch management is critical**: Multiple local branches cause silent issues with git stash/pop. Always verify current branch with `git branch --show-current` before any operation.
+- **PDFtoImage API namespaces**: Must use `PDFtoImage.Compatibility.Conversion` (not `PDFtoImage.Conversion`) — the non-Compatibility namespace uses different parameter types.
+- **Migration idempotency**: Always check if tables exist before ALTER TABLE — tests may create partial DBs.
+- **Save recovery copies**: When doing complex multi-file changes across branches, save files to /tmp as insurance.
