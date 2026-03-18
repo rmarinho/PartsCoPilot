@@ -63,7 +63,7 @@ public class MigrationSystemTests : IDisposable
             PartRecordId = "test-part",
             PartNumber = "901-101-013-00",
             Description = "Test part",
-            Model = "911T",
+            ModelName = "911T",
             PageNumber = 42,
             Illustration = "101-00",
             SavedAt = DateTime.UtcNow
@@ -73,7 +73,7 @@ public class MigrationSystemTests : IDisposable
 
         var retrieved = await _db.FindAsync<FavoriteEntity>(favorite.Id);
         retrieved.Should().NotBeNull();
-        retrieved!.Model.Should().Be("911T");
+        retrieved!.ModelName.Should().Be("911T");
         retrieved.PageNumber.Should().Be(42);
         retrieved.Illustration.Should().Be("101-00");
     }
