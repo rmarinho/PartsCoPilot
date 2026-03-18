@@ -15,13 +15,16 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
     <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
     <PackageReference Include="PdfPig" Version="0.1.13" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+    <PackageReference Include="PDFtoImage" Version="4.1.1" />
+    <PackageReference Include="NSubstitute" Version="5.3.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Link source files instead of project reference (MAUI project can't be referenced by net11.0) -->
     <Compile Include="../../Services/HybridSearchService.cs" Link="Services/HybridSearchService.cs" />
     <Compile Include="../../Services/PorscheClassicManualParser.cs" Link="Services/PorscheClassicManualParser.cs" />
     <Compile Include="../../Services/PdfIngestionService.cs" Link="Services/PdfIngestionService.cs" />
+    <Compile Include="../../Services/PdfPageRenderer.cs" Link="Services/PdfPageRenderer.cs" />
     <Compile Include="../../Services/Interfaces.cs" Link="Services/Interfaces.cs" />
     <Compile Include="../../Services/PromptBuilder.cs" Link="Services/PromptBuilder.cs" />
     <Compile Include="../../Services/TokenEstimator.cs" Link="Services/TokenEstimator.cs" />
@@ -39,5 +42,13 @@
     <Compile Include="../../Services/ManualNavigationService.cs" Link="Services/ManualNavigationService.cs" />
     <Compile Include="../../Services/ISettingsService.cs" Link="Services/ISettingsService.cs" />
     <Compile Include="../../ViewModels/SettingsViewModel.cs" Link="ViewModels/SettingsViewModel.cs" />
+    <!-- ViewModels for unit testing -->
+    <Compile Include="../../ViewModels/SearchViewModel.cs" Link="ViewModels/SearchViewModel.cs" />
+    <Compile Include="../../ViewModels/HomeViewModel.cs" Link="ViewModels/HomeViewModel.cs" />
+    <Compile Include="../../ViewModels/ComparePartsViewModel.cs" Link="ViewModels/ComparePartsViewModel.cs" />
+    <Compile Include="../../ViewModels/FavoritesViewModel.cs" Link="ViewModels/FavoritesViewModel.cs" />
+    <Compile Include="../../ViewModels/ManualViewerViewModel.cs" Link="ViewModels/ManualViewerViewModel.cs" />
+    <Compile Include="../../ViewModels/PartDetailsViewModel.cs" Link="ViewModels/PartDetailsViewModel.cs" />
+    <Compile Include="../../Converters/ValueConverters.cs" Link="Converters/ValueConverters.cs" />
   </ItemGroup>
 </Project>
