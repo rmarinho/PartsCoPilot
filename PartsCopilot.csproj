@@ -66,6 +66,12 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<!-- Exclude test directory from SDK default globbing -->
+	<ItemGroup>
+		<Compile Remove="tests/**" />
+		<None Remove="tests/**" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0-preview.1.26104.118" />
