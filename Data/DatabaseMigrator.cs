@@ -122,6 +122,22 @@ public class DatabaseMigrator
             if (!hasIllustration)
                 await db.ExecuteAsync("ALTER TABLE Favorites ADD COLUMN Illustration TEXT");
         }));
+
+        // Migration 4: Add pre-rendered page images for PDF page rendering
+        _migrations.Add(new Migration(4, "Add ImageData to Pages", async db =>
+        {
+            // Pages table is created by CreateTableAsync<PageEntity> at data-load time,
+            // so it may not exist yet in a freshly-migrated database.
+            var tableExists = await db.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Pages'");
+            if (tableExists == 0)
+                return;
+
+            var existingColumns = await db.ExecuteScalarAsync<string>("SELECT GROUP_CONCAT(name) FROM pragma_table_info('Pages')");
+            var hasImageData = existingColumns?.Contains("ImageData") ?? false;
+            if (!hasImageData)
+                await db.ExecuteAsync("ALTER TABLE Pages ADD COLUMN ImageData BLOB");
+        }));
     }
 
     private async Task EnsureVersionTablesAsync()

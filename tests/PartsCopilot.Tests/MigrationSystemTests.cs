@@ -182,13 +182,15 @@ public class MigrationSystemTests : IDisposable
 
         var history = await migrator.GetMigrationHistoryAsync();
         
-        history.Should().HaveCount(3);
+        history.Should().HaveCount(4);
         history[0].Version.Should().Be(1);
         history[0].Name.Should().Be("Baseline schema");
         history[1].Version.Should().Be(2);
         history[1].Name.Should().Be("Add supporting tables");
         history[2].Version.Should().Be(3);
         history[2].Name.Should().Be("Extend FavoriteEntry schema");
+        history[3].Version.Should().Be(4);
+        history[3].Name.Should().Be("Add ImageData to Pages");
         
         history.All(h => h.Success).Should().BeTrue();
     }

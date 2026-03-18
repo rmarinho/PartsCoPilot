@@ -29,6 +29,11 @@ public sealed record ManualPage
     public string? Illustration { get; init; }
     public string? Section { get; init; }
     public required string PageType { get; init; }
+    /// <summary>
+    /// Pre-rendered PNG image of the full PDF page (illustrations, diagrams, text layout).
+    /// Null when rendering was unavailable or failed — viewer falls back to text mode.
+    /// </summary>
+    public byte[]? ImageData { get; init; }
 }
 
 /// <summary>

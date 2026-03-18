@@ -30,7 +30,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new AppDatabase(dbPath));
 
 		// Services
-		builder.Services.AddSingleton<IPdfIngestionService, PdfIngestionService>();
+		builder.Services.AddSingleton<IPdfPageRenderer, PdfPageRenderer>();
+		builder.Services.AddSingleton<IPdfIngestionService>(sp =>
+			new PdfIngestionService(sp.GetService<IPdfPageRenderer>()));
 		builder.Services.AddSingleton<IManualParser, PorscheClassicManualParser>();
 		builder.Services.AddSingleton<IPartsRepository, PartsRepository>();
 		builder.Services.AddSingleton<ISearchService, HybridSearchService>();

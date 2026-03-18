@@ -83,19 +83,22 @@ public class PageEntity
     public string? Illustration { get; set; }
     public string? Section { get; set; }
     public string PageType { get; set; } = "";
+    public byte[]? ImageData { get; set; }
 
     public ManualPage ToDomain() => new()
     {
         Id = Id, ManualId = ManualId, PageNumber = PageNumber,
         RawText = RawText, Illustration = Illustration,
-        Section = Section, PageType = PageType
+        Section = Section, PageType = PageType,
+        ImageData = ImageData
     };
 
     public static PageEntity FromDomain(ManualPage p) => new()
     {
         Id = p.Id, ManualId = p.ManualId, PageNumber = p.PageNumber,
         RawText = p.RawText, Illustration = p.Illustration,
-        Section = p.Section, PageType = p.PageType
+        Section = p.Section, PageType = p.PageType,
+        ImageData = p.ImageData
     };
 }
 

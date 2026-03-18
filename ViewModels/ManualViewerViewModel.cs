@@ -67,6 +67,35 @@ public partial class ManualViewerViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty]
     private string _pageIndicator = "";
 
+    [ObservableProperty]
+    private ImageSource? _pageImageSource;
+
+    [ObservableProperty]
+    private bool _hasImage;
+
+    [ObservableProperty]
+    private bool _isImageMode = true;
+
+    public bool IsTextMode => !IsImageMode || !HasImage;
+    public bool ShowImageView => IsImageMode && HasImage;
+    public string ViewModeLabel => IsImageMode && HasImage ? "Text" : "Image";
+    public bool CanToggleViewMode => HasImage;
+
+    partial void OnIsImageModeChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsTextMode));
+        OnPropertyChanged(nameof(ShowImageView));
+        OnPropertyChanged(nameof(ViewModeLabel));
+    }
+
+    partial void OnHasImageChanged(bool value)
+    {
+        OnPropertyChanged(nameof(IsTextMode));
+        OnPropertyChanged(nameof(ShowImageView));
+        OnPropertyChanged(nameof(ViewModeLabel));
+        OnPropertyChanged(nameof(CanToggleViewMode));
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("ManualId", out var midObj) && midObj is string mid)
@@ -99,6 +128,8 @@ public partial class ManualViewerViewModel : ObservableObject, IQueryAttributabl
             IsLoading = true;
             HasError = false;
             HasContent = false;
+            HasImage = false;
+            PageImageSource = null;
 
             // Load manual metadata for title and page count
             var manual = await _repo.GetManualAsync(ManualId);
@@ -125,6 +156,19 @@ public partial class ManualViewerViewModel : ObservableObject, IQueryAttributabl
             PageTitle = BuildPageTitle(page);
             HasContent = true;
 
+            // Load rendered page image if available
+            if (page.ImageData is { Length: > 0 })
+            {
+                PageImageSource = ImageSource.FromStream(() => new MemoryStream(page.ImageData));
+                HasImage = true;
+                IsImageMode = true;
+            }
+            else
+            {
+                HasImage = false;
+                IsImageMode = false;
+            }
+
             UpdateNavigationState();
         }
         catch (Exception ex)
@@ -136,6 +180,13 @@ public partial class ManualViewerViewModel : ObservableObject, IQueryAttributabl
         {
             IsLoading = false;
         }
+    }
+
+    [RelayCommand]
+    private void ToggleViewMode()
+    {
+        if (HasImage)
+            IsImageMode = !IsImageMode;
     }
 
     [RelayCommand]
