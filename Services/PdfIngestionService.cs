@@ -24,38 +24,60 @@ public class PdfIngestionService : IPdfIngestionService
         {
             var pages = new List<ManualPage>();
 
-            using var document = PdfDocument.Open(filePath);
-
-            foreach (var page in document.GetPages())
+            PdfDocument document;
+            try
             {
-                ct.ThrowIfCancellationRequested();
-
-                var text = ExtractTextWithLines(page);
-                if (string.IsNullOrWhiteSpace(text))
-                    continue;
-
-                var illustration = DetectIllustration(text);
-                var pageType = ClassifyPage(text, illustration);
-
-                // Try to render the page to an image for visual display
-                byte[]? imageData = null;
-                if (_renderer is not null && _renderer.IsSupported)
-                {
-                    imageData = await _renderer.RenderPageToImageAsync(filePath, page.Number, ct: ct);
-                }
-
-                pages.Add(new ManualPage
-                {
-                    ManualId = manualId,
-                    PageNumber = page.Number,
-                    RawText = text,
-                    Illustration = illustration,
-                    PageType = pageType,
-                    ImageData = imageData
-                });
+                document = PdfDocument.Open(filePath);
+            }
+            catch (FileNotFoundException)
+            {
+                throw new InvalidOperationException($"PDF file not found: {filePath}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new InvalidOperationException($"Cannot access PDF file (permission denied): {filePath}");
+            }
+            catch (Exception ex) when (ex.Message.Contains("password") || ex.Message.Contains("encrypted"))
+            {
+                throw new InvalidOperationException("PDF file is password-protected. Please remove the password and try again.");
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to open PDF file: {ex.Message}");
             }
 
-            return (IReadOnlyList<ManualPage>)pages;
+            using (document)
+
+                foreach (var page in document.GetPages())
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    var text = ExtractTextWithLines(page);
+                    if (string.IsNullOrWhiteSpace(text))
+                        continue;
+
+                    var illustration = DetectIllustration(text);
+                    var pageType = ClassifyPage(text, illustration);
+
+                    // Try to render the page to an image for visual display
+                    byte[]? imageData = null;
+                    if (_renderer is not null && _renderer.IsSupported)
+                    {
+                        imageData = await _renderer.RenderPageToImageAsync(filePath, page.Number, ct: ct);
+                    }
+
+                    pages.Add(new ManualPage
+                    {
+                        ManualId = manualId,
+                        PageNumber = page.Number,
+                        RawText = text,
+                        Illustration = illustration,
+                        PageType = pageType,
+                        ImageData = imageData
+                    });
+                }
+
+                return (IReadOnlyList<ManualPage>)pages;
         }, ct);
     }
 

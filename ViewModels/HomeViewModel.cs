@@ -62,9 +62,19 @@ public partial class HomeViewModel : ObservableObject
             ImportProgress = 0;
 
             var manualId = Guid.NewGuid().ToString();
+            var filePath = result.FullPath;
 
             // Stage 1: Extract pages
-            var pages = await _ingestion.ExtractPagesAsync(result.FullPath, manualId);
+            IReadOnlyList<ManualPage> pages;
+#if MACCATALYST
+            // On Mac Catalyst, we need to handle security-scoped resources
+            pages = await Platforms.MacCatalyst.FileAccessHelper.WithSecurityScopeAsync(
+                filePath,
+                async () => await _ingestion.ExtractPagesAsync(filePath, manualId)
+            );
+#else
+            pages = await _ingestion.ExtractPagesAsync(filePath, manualId);
+#endif
             ImportStatus = $"Extracted {pages.Count} pages. Parsing parts...";
             ImportProgress = 30;
 
@@ -79,7 +89,7 @@ public partial class HomeViewModel : ObservableObject
             {
                 Id = manualId,
                 Title = Path.GetFileNameWithoutExtension(result.FileName),
-                FilePath = result.FullPath,
+                FilePath = filePath,
                 ManualType = _parser.ManualType,
                 PageCount = pages.Count,
                 PartCount = parts.Count
