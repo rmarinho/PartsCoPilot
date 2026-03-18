@@ -286,3 +286,62 @@
 - **Concurrent agent interference is a major challenge**: Other agents repeatedly deleted files and switched branches. Workaround: use Python to write files atomically and git add immediately
 - **CommunityToolkit.Mvvm source generators work in net11.0**: No MAUI workload needed; the NuGet package provides everything
 - **NSubstitute.ExceptionExtensions**: Use `.Throws()` not `.ThrowsAsync()` for configuring mock exceptions
+
+### 2026-03-18 — PDF Import Fix on Mac Catalyst — COMPLETED
+
+**Problem:** Import button triggered file picker successfully (after Pris's entitlement fix), but after selecting a PDF, nothing visually happened — the import silently failed.
+
+**Root causes identified:**
+1. **Mac Catalyst sandbox restriction** — Files picked via `FilePicker` need explicit `NSUrl.StartAccessingSecurityScopedResource()` / `StopAccessingSecurityScopedResource()` calls
+2. **No error handling in PdfIngestionService** — `PdfDocument.Open(filePath)` had zero try-catch, so errors propagated with cryptic messages
+3. **No demo PDF for testing** — Developers couldn't easily reproduce the flow without a real manual
+
+**Fixes applied:**
+1. **Created `Platforms/MacCatalyst/FileAccessHelper.cs`:**
+   - Static helper with `WithSecurityScope<T>()` and `WithSecurityScopeAsync<T>()` methods
+   - Wraps file operations with `StartAccessingSecurityScopedResource` / `StopAccessingSecurityScopedResource`
+   - Ensures resource is always released in finally block
+   
+2. **Added error handling to `PdfIngestionService.ExtractPagesAsync()`:**
+   - Try-catch around `PdfDocument.Open()` with specific exception types:
+     - `FileNotFoundException` → "PDF file not found"
+     - `UnauthorizedAccessException` → "Cannot access PDF file (permission denied)"
+     - Password/encrypted → "PDF file is password-protected"
+     - Generic fallback → "Failed to open PDF file"
+   - Changed from `using var document =` to `using (document)` block for proper scope
+
+3. **Updated `HomeViewModel.ImportManualAsync()`:**
+   - On Mac Catalyst, wraps `_ingestion.ExtractPagesAsync()` call in `FileAccessHelper.WithSecurityScopeAsync()`
+   - Extracted `filePath` variable to use in both security scope handler and manual metadata
+
+4. **Created `Resources/Raw/demo-manual.pdf`:**
+   - 3-page PDF with Porsche 911/912 parts catalog structure
+   - Page 1: Title page with "PORSCHE 911/912 PARTS CATALOG", "Illustration: 001-00"
+   - Page 2: Parts table with 3 parts (cylinder head gasket, valve cover gasket, hex bolt)
+   - Page 3: Parts table with 2 parts (oil pump assembly, oil pump drive shaft)
+   - Created via Python reportlab library
+   - Proper format for parser to detect illustrations and extract part numbers
+
+**Testing:**
+- ✅ `dotnet build -f net11.0-maccatalyst -c Release` — 0 errors (24 warnings, all pre-existing)
+- ✅ `dotnet test tests/PartsCopilot.Tests/ -c Release` — 303/303 tests passing
+- 🚀 App launches successfully
+
+**Files changed:**
+- `Platforms/MacCatalyst/FileAccessHelper.cs` — new (63 lines)
+- `Services/PdfIngestionService.cs` — added try-catch blocks around PDF open (74 lines changed)
+- `ViewModels/HomeViewModel.cs` — Mac Catalyst conditional security scope handling (14 lines)
+- `Resources/Raw/demo-manual.pdf` — new (2.7KB, 3 pages)
+
+**Key learnings:**
+- Mac Catalyst apps run in Apple's App Sandbox — even after `FilePicker` selection, file access requires explicit security-scoped resource calls
+- The pattern is: `NSUrl.FromFilename()` → `StartAccessingSecurityScopedResource()` → perform file operation → `StopAccessingSecurityScopedResource()` in finally
+- Platform-specific helpers go in `Platforms/{Platform}/` and can be conditionally compiled with `#if MACCATALYST`
+- PDF error handling should be granular (file not found vs permissions vs password-protected) to give users actionable messages
+- Demo assets for testing complex flows (PDF import) should be bundled in `Resources/Raw/`
+
+**Cross-team impact:**
+- Pris: Import now works end-to-end on Mac Catalyst — users will see progress bars and status messages
+- Rachael: Parser will successfully extract parts from demo PDF (5 parts across 2 illustrations)
+
+**Commit:** 659fcc0
