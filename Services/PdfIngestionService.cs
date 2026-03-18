@@ -7,12 +7,20 @@ namespace PartsCopilot.Services;
 
 public class PdfIngestionService : IPdfIngestionService
 {
-    // Y-coordinate tolerance for grouping words into lines (PDF points)
     private const double LineGroupingTolerance = 3.0;
+
+    private readonly IPdfPageRenderer? _renderer;
+
+    public PdfIngestionService() { }
+
+    public PdfIngestionService(IPdfPageRenderer? renderer)
+    {
+        _renderer = renderer;
+    }
 
     public Task<IReadOnlyList<ManualPage>> ExtractPagesAsync(string filePath, string manualId, CancellationToken ct = default)
     {
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
             var pages = new List<ManualPage>();
 
@@ -29,13 +37,21 @@ public class PdfIngestionService : IPdfIngestionService
                 var illustration = DetectIllustration(text);
                 var pageType = ClassifyPage(text, illustration);
 
+                // Try to render the page to an image for visual display
+                byte[]? imageData = null;
+                if (_renderer is not null && _renderer.IsSupported)
+                {
+                    imageData = await _renderer.RenderPageToImageAsync(filePath, page.Number, ct: ct);
+                }
+
                 pages.Add(new ManualPage
                 {
                     ManualId = manualId,
                     PageNumber = page.Number,
                     RawText = text,
                     Illustration = illustration,
-                    PageType = pageType
+                    PageType = pageType,
+                    ImageData = imageData
                 });
             }
 

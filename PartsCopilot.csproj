@@ -85,6 +85,7 @@
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
 		<PackageReference Include="PdfPig" Version="0.1.13" />
+		<PackageReference Include="PDFtoImage" Version="4.1.1" />
 		<PackageReference Include="Microsoft.SemanticKernel" Version="1.73.0" />
 		<PackageReference Include="Redth.MauiDevFlow.Agent" Version="*" Condition="'$(Configuration)' == 'Debug'" />
 	</ItemGroup>

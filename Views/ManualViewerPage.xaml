@@ -10,49 +10,65 @@
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="0">
 
-        <!-- Header: manual title + illustration badge -->
+        <!-- Header: manual title + illustration badge + view mode toggle -->
         <Border
             Grid.Row="0"
             BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
             Padding="16,12"
             StrokeThickness="0">
-            <VerticalStackLayout Spacing="4">
-                <Label
-                    Text="{Binding ManualTitle}"
-                    FontSize="13"
-                    TextColor="White"
-                    Opacity="0.85"
-                    IsVisible="{Binding ManualTitle, Converter={StaticResource IsNotNullConverter}}" />
-                <HorizontalStackLayout Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Spacing="4" Grid.Column="0">
                     <Label
-                        Text="{Binding PageIndicator}"
-                        FontSize="16"
-                        FontAttributes="Bold"
-                        TextColor="White" />
-                    <Border
-                        BackgroundColor="#FFFFFF33"
-                        StrokeShape="RoundRectangle 10"
-                        Padding="8,2"
-                        StrokeThickness="0"
-                        IsVisible="{Binding Illustration, Converter={StaticResource IsNotNullConverter}}">
+                        Text="{Binding ManualTitle}"
+                        FontSize="13"
+                        TextColor="White"
+                        Opacity="0.85"
+                        IsVisible="{Binding ManualTitle, Converter={StaticResource IsNotNullConverter}}" />
+                    <HorizontalStackLayout Spacing="10">
                         <Label
-                            Text="{Binding Illustration, StringFormat='Ill. {0}'}"
-                            FontSize="12"
+                            Text="{Binding PageIndicator}"
+                            FontSize="16"
+                            FontAttributes="Bold"
                             TextColor="White" />
-                    </Border>
-                    <Border
-                        BackgroundColor="#FFFFFF33"
-                        StrokeShape="RoundRectangle 10"
-                        Padding="8,2"
-                        StrokeThickness="0"
-                        IsVisible="{Binding Section, Converter={StaticResource IsNotNullConverter}}">
-                        <Label
-                            Text="{Binding Section}"
-                            FontSize="12"
-                            TextColor="White" />
-                    </Border>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
+                        <Border
+                            BackgroundColor="#FFFFFF33"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,2"
+                            StrokeThickness="0"
+                            IsVisible="{Binding Illustration, Converter={StaticResource IsNotNullConverter}}">
+                            <Label
+                                Text="{Binding Illustration, StringFormat='Ill. {0}'}"
+                                FontSize="12"
+                                TextColor="White" />
+                        </Border>
+                        <Border
+                            BackgroundColor="#FFFFFF33"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,2"
+                            StrokeThickness="0"
+                            IsVisible="{Binding Section, Converter={StaticResource IsNotNullConverter}}">
+                            <Label
+                                Text="{Binding Section}"
+                                FontSize="12"
+                                TextColor="White" />
+                        </Border>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- View mode toggle (image/text) -->
+                <Button
+                    Grid.Column="1"
+                    Text="{Binding ViewModeLabel}"
+                    Command="{Binding ToggleViewModeCommand}"
+                    IsVisible="{Binding CanToggleViewMode}"
+                    VerticalOptions="Center"
+                    BackgroundColor="#FFFFFF33"
+                    TextColor="White"
+                    FontSize="12"
+                    Padding="10,4"
+                    CornerRadius="12"
+                    HeightRequest="32" />
+            </Grid>
         </Border>
 
         <!-- Content area -->
@@ -96,9 +112,33 @@
                     Margin="0,8,0,0" />
             </VerticalStackLayout>
 
-            <!-- Page content -->
-            <ScrollView IsVisible="{Binding HasContent}" Padding="16">
-                <VerticalStackLayout Spacing="8">
+            <!-- Image mode: rendered PDF page with pinch-to-zoom -->
+            <Grid
+                x:Name="ImageContainer"
+                IsVisible="{Binding ShowImageView}"
+                BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#1A1A1A}">
+                <ScrollView
+                    Orientation="Both"
+                    HorizontalScrollBarVisibility="Default"
+                    VerticalScrollBarVisibility="Default">
+                    <Image
+                        x:Name="PageImage"
+                        Source="{Binding PageImageSource}"
+                        Aspect="AspectFit"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                            <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                            <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnDoubleTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </ScrollView>
+            </Grid>
+
+            <!-- Text mode: extracted text content -->
+            <ScrollView IsVisible="{Binding IsTextMode}" Padding="16">
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding HasContent}">
                     <!-- Page type badge -->
                     <Border
                         BackgroundColor="{AppThemeBinding Light=#F0F0F0, Dark=#333333}"

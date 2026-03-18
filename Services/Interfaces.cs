@@ -11,6 +11,16 @@ public interface IPdfIngestionService
 }
 
 /// <summary>
+/// Renders individual PDF pages to PNG images for display in the manual viewer.
+/// Returns null on platforms where native rendering is unavailable.
+/// </summary>
+public interface IPdfPageRenderer
+{
+    Task<byte[]?> RenderPageToImageAsync(string filePath, int pageNumber, int dpi = 150, CancellationToken ct = default);
+    bool IsSupported { get; }
+}
+
+/// <summary>
 /// Parses raw page text into structured part records.
 /// Implementations are manual-specific (e.g., Porsche classic format).
 /// </summary>
