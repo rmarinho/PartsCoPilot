@@ -106,6 +106,19 @@
                         SemanticProperties.Hint="Navigate to the parts search page"
                         AutomationId="SearchPartsButton" />
 
+                <!-- View Manual Button -->
+                <Button Text="📖 View Manual"
+                        Command="{Binding ViewManualCommand}"
+                        IsVisible="{Binding HasManual}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryButtonBg_Light}, Dark={StaticResource SecondaryButtonBg_Dark}}"
+                        TextColor="{AppThemeBinding Light={StaticResource SecondaryButtonText_Light}, Dark={StaticResource SecondaryButtonText_Dark}}"
+                        CornerRadius="8"
+                        HeightRequest="50"
+                        FontSize="16"
+                        SemanticProperties.Description="View the imported manual pages"
+                        SemanticProperties.Hint="Navigate to the manual viewer page"
+                        AutomationId="ViewManualButton" />
+
             </VerticalStackLayout>
         </ScrollView>
 

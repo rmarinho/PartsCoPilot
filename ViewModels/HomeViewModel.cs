@@ -104,6 +104,9 @@ public partial class HomeViewModel : ObservableObject
             ActiveManualTitle = manual.Title;
             TotalParts = parts.Count;
             HasManual = true;
+
+            // Navigate to the manual viewer to show the imported PDF
+            await Shell.Current.GoToAsync($"manual-viewer?ManualId={manualId}&PageNumber=1");
         }
         catch (Exception ex)
         {
@@ -132,5 +135,17 @@ public partial class HomeViewModel : ObservableObject
     private async Task GoToSearchAsync()
     {
         await Shell.Current.GoToAsync("//search");
+    }
+
+    [RelayCommand]
+    private async Task ViewManualAsync()
+    {
+        // Navigate to the first page of the active manual
+        var manuals = await _repo.GetAllManualsAsync();
+        var active = manuals.FirstOrDefault();
+        if (active is not null)
+        {
+            await Shell.Current.GoToAsync($"manual-viewer?ManualId={active.Id}&PageNumber=1");
+        }
     }
 }
