@@ -41,3 +41,18 @@
 - **Key files**: `Services/TokenEstimator.cs`, `Services/ContextTrimmer.cs`, `Services/PromptBuilder.cs`, `Models/AiModels.cs` (removed duplicate ContextBudget).
 - **Testing**: 25 unit tests covering token estimation, budget enforcement, relevance ordering, truncation logic. All passing.
 - **Consolidation**: Moved ContextBudget from Models to Services namespace to eliminate duplicate definitions.
+
+### Cross-Team Updates (2026-03-17T18:30:00Z)
+
+**Roy's Sprint #31 — Database Migration + Parser Fixes:**
+- Versioned migration system with column-exists check for idempotency
+- N+1 query fix in SearchPartsAsync (parameterized SQL, composite index)
+- Parser improvements: hyphenated part numbers, fractional quantities, case-insensitive illustration matching
+- All 86 tests passing (24 new migration + parser coverage)
+- **Impact for Rachael:** PartsRepository now supports pagination, reduced memory footprint improves AI context efficiency
+
+**Pris's UI Work (from previous session):**
+- Manual Viewer Page: text-based rendering of ManualPage.RawText from SQLite
+- Compare Parts flow: embedded search panel for Part B selection, 9-field side-by-side comparison
+- Shell restructure: Tab-based navigation (Home, Search, Favorites)
+- **Impact for Rachael:** ManualNavigationService integration enables page navigation in search results

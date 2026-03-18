@@ -55,19 +55,18 @@ public partial class PorscheClassicManualParser : IManualParser
         foreach (Match match in matches)
         {
             var partNumber = match.Value.Trim();
-            var normalized = partNumber.Replace(" ", "").ToUpperInvariant();
+            var normalized = partNumber.Replace(" ", "").Replace("-", "").ToUpperInvariant();
 
             // Try to extract context around the part number
             var startIdx = match.Index;
             var contextEnd = Math.Min(text.Length, startIdx + 200);
-            var contextStart = Math.Max(0, startIdx - 50);
-            var context = text[contextStart..contextEnd];
+            var context = text[startIdx..contextEnd];
 
             var description = ExtractDescription(context, partNumber);
-            var quantity = ExtractQuantity(context);
+            var quantity = ExtractQuantity(context, partNumber);
             var model = ExtractModel(context);
             var remark = ExtractRemark(context);
-            var position = ExtractPosition(context);
+            var position = ExtractPosition(text[Math.Max(0, startIdx - 50)..contextEnd]);
 
             if (string.IsNullOrWhiteSpace(description))
                 description = "Unknown part";
@@ -106,8 +105,15 @@ public partial class PorscheClassicManualParser : IManualParser
         return descMatch.Success ? descMatch.Groups[1].Value.Trim() : null;
     }
 
-    private static string? ExtractQuantity(string context)
+    private static string? ExtractQuantity(string context, string partNumber)
     {
+        // Skip past the part number itself to avoid picking up its digits
+        var partIdx = context.IndexOf(partNumber, StringComparison.Ordinal);
+        if (partIdx >= 0)
+        {
+            context = context[(partIdx + partNumber.Length)..];
+        }
+
         // Try patterns in order of specificity:
         // 1. "Qty: 3" or "Qty 3" or "QTY:3"
         var match = Regex.Match(context, @"\bQty\s*[:.]?\s*(\d+)", RegexOptions.IgnoreCase);
