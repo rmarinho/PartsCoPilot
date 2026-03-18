@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:PartsCopilot.ViewModels"
+             x:Class="PartsCopilot.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings"
+             AutomationId="SettingsPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- ═══ API Key Section ═══ -->
+            <Border Padding="16" Stroke="Transparent"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground_Light}, Dark={StaticResource CardBackground_Dark}}"
+                    AutomationId="ApiKeyCard">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="🔑 OpenAI API Key"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimary_Light}, Dark={StaticResource TextPrimary_Dark}}"
+                           SemanticProperties.HeadingLevel="Level2"
+                           AutomationId="ApiKeyHeader" />
+
+                    <Label Text="Your key is stored securely on-device using platform keychain."
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}" />
+
+                    <Entry Placeholder="sk-..."
+                           Text="{Binding ApiKey}"
+                           IsPassword="True"
+                           Keyboard="Plain"
+                           ClearButtonVisibility="WhileEditing"
+                           SemanticProperties.Description="OpenAI API key input"
+                           SemanticProperties.Hint="Enter your OpenAI API key"
+                           AutomationId="ApiKeyEntry" />
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Text="🧪 Test Connection"
+                                Command="{Binding TestConnectionCommand}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryButtonBg_Light}, Dark={StaticResource PrimaryButtonBg_Dark}}"
+                                TextColor="{AppThemeBinding Light={StaticResource PrimaryButtonText_Light}, Dark={StaticResource PrimaryButtonText_Dark}}"
+                                FontSize="14"
+                                Padding="12,8"
+                                IsEnabled="{Binding IsTestingConnection, Converter={StaticResource InvertedBoolConverter}}"
+                                SemanticProperties.Description="Test API connection"
+                                AutomationId="TestConnectionButton" />
+
+                        <Button Text="✕ Clear"
+                                Command="{Binding ClearApiKeyCommand}"
+                                BackgroundColor="Transparent"
+                                TextColor="{AppThemeBinding Light={StaticResource GhostButtonText_Light}, Dark={StaticResource GhostButtonText_Dark}}"
+                                FontSize="14"
+                                Padding="12,8"
+                                SemanticProperties.Description="Clear API key"
+                                AutomationId="ClearApiKeyButton" />
+                    </HorizontalStackLayout>
+
+                    <ActivityIndicator IsRunning="{Binding IsTestingConnection}"
+                                       IsVisible="{Binding IsTestingConnection}"
+                                       HeightRequest="24"
+                                       HorizontalOptions="Start"
+                                       AutomationId="ConnectionTestSpinner" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ═══ Model Selection ═══ -->
+            <Border Padding="16" Stroke="Transparent"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground_Light}, Dark={StaticResource CardBackground_Dark}}"
+                    AutomationId="ModelCard">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="🤖 AI Model"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimary_Light}, Dark={StaticResource TextPrimary_Dark}}"
+                           SemanticProperties.HeadingLevel="Level2"
+                           AutomationId="ModelHeader" />
+
+                    <Label Text="Choose the OpenAI model for AI-assisted search."
+                           FontSize="13"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondary_Light}, Dark={StaticResource TextSecondary_Dark}}" />
+
+                    <Picker Title="Select Model"
+                            ItemsSource="{Binding AvailableModels}"
+                            SelectedItem="{Binding SelectedModel}"
+                            SemanticProperties.Description="AI model selection"
+                            SemanticProperties.Hint="Choose which OpenAI model to use"
+                            AutomationId="ModelPicker" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ═══ Theme Section ═══ -->
+            <Border Padding="16" Stroke="Transparent"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackground_Light}, Dark={StaticResource CardBackground_Dark}}"
+                    AutomationId="ThemeCard">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12">
+
+                    <Label Text="🎨 Appearance"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimary_Light}, Dark={StaticResource TextPrimary_Dark}}"
+                           SemanticProperties.HeadingLevel="Level2"
+                           AutomationId="ThemeHeader" />
+
+                    <Picker Title="Theme"
+                            ItemsSource="{Binding ThemeOptions}"
+                            SelectedItem="{Binding SelectedThemeName}"
+                            SemanticProperties.Description="App theme preference"
+                            SemanticProperties.Hint="Choose System, Light, or Dark theme"
+                            AutomationId="ThemePicker" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ═══ Status Message ═══ -->
+            <Label Text="{Binding StatusMessage}"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource IsNotNullConverter}}"
+                   FontSize="14"
+                   HorizontalOptions="Center"
+                   Margin="0,4"
+                   AutomationId="StatusMessageLabel">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsStatusError}" Value="True">
+                        <Setter Property="TextColor"
+                                Value="{AppThemeBinding Light={StaticResource ErrorText_Light}, Dark={StaticResource ErrorText_Dark}}" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsStatusError}" Value="False">
+                        <Setter Property="TextColor"
+                                Value="{AppThemeBinding Light={StaticResource SuccessText_Light}, Dark={StaticResource SuccessText_Dark}}" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <!-- ═══ Save Button ═══ -->
+            <Button Text="💾 Save Settings"
+                    Command="{Binding SaveSettingsCommand}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SecondaryButtonBg_Light}, Dark={StaticResource SecondaryButtonBg_Dark}}"
+                    TextColor="{AppThemeBinding Light={StaticResource SecondaryButtonText_Light}, Dark={StaticResource SecondaryButtonText_Dark}}"
+                    FontSize="16"
+                    Padding="16,12"
+                    HorizontalOptions="Fill"
+                    IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
+                    SemanticProperties.Description="Save all settings"
+                    AutomationId="SaveSettingsButton" />
+
+            <!-- ═══ App Info ═══ -->
+            <Label Text="PartsCopilot — AI-Assisted Porsche Parts Catalog"
+                   FontSize="11"
+                   TextColor="{AppThemeBinding Light={StaticResource TextMuted_Light}, Dark={StaticResource TextMuted_Dark}}"
+                   HorizontalOptions="Center"
+                   Margin="0,8"
+                   AutomationId="AppInfoLabel" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

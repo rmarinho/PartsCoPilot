@@ -31,12 +31,18 @@ public sealed class PartsAiService : IPartsAiService
     private readonly Kernel _kernel;
     private readonly IPromptBuilder _promptBuilder;
     private readonly ILogger<PartsAiService> _logger;
+    private readonly ISettingsService? _settingsService;
 
-    public PartsAiService(Kernel kernel, IPromptBuilder promptBuilder, ILogger<PartsAiService> logger)
+    private IChatCompletionService? _settingsChat;
+    private string? _cachedKey;
+    private string? _cachedModel;
+
+    public PartsAiService(Kernel kernel, IPromptBuilder promptBuilder, ILogger<PartsAiService> logger, ISettingsService? settingsService = null)
     {
         _kernel = kernel;
         _promptBuilder = promptBuilder;
         _logger = logger;
+        _settingsService = settingsService;
     }
 
     public async Task<AiAnswer> AskAsync(PromptContext context, CancellationToken ct = default)
@@ -97,7 +103,7 @@ public sealed class PartsAiService : IPartsAiService
 
     private async Task<string?> CallLlmAsync(string prompt, CancellationToken ct)
     {
-        var chat = _kernel.GetRequiredService<IChatCompletionService>();
+        var chat = await GetChatServiceAsync();
 
         var history = new ChatHistory();
         history.AddUserMessage(prompt);
@@ -120,6 +126,31 @@ public sealed class PartsAiService : IPartsAiService
             or HttpStatusCode.GatewayTimeout
             or HttpStatusCode.BadGateway
             or HttpStatusCode.RequestTimeout;
+
+    private async Task<IChatCompletionService> GetChatServiceAsync()
+    {
+        if (_settingsService is null)
+            return _kernel.GetRequiredService<IChatCompletionService>();
+
+        var key = await _settingsService.GetApiKeyAsync();
+        var model = _settingsService.GetModel();
+
+        if (string.IsNullOrWhiteSpace(key))
+            return _kernel.GetRequiredService<IChatCompletionService>();
+
+        if (_settingsChat is not null && key == _cachedKey && model == _cachedModel)
+            return _settingsChat;
+
+        var kb = Kernel.CreateBuilder();
+        kb.AddOpenAIChatCompletion(model, key);
+        var tempKernel = kb.Build();
+        _settingsChat = tempKernel.GetRequiredService<IChatCompletionService>();
+        _cachedKey = key;
+        _cachedModel = model;
+
+        _logger.LogInformation("AI chat service updated from user settings (model: {Model}).", model);
+        return _settingsChat;
+    }
 
     private AiAnswer ParseResponse(string json)
     {

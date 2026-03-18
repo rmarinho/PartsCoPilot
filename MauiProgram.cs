@@ -39,6 +39,9 @@ public static class MauiProgram
 		builder.Services.AddSingleton<IUserDataRepository, UserDataRepository>();
 		builder.Services.AddSingleton<SeedDataService>();
 
+		// Settings (SecureStorage-backed)
+		builder.Services.AddSingleton<ISettingsService, SettingsService>();
+
 		// AI layer
 		builder.Services.AddSingleton<IPromptBuilder, PromptBuilder>();
 		builder.Services.AddSingleton<IPartsAiService, PartsAiService>();
@@ -62,6 +65,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<PartDetailsViewModel>();
 		builder.Services.AddTransient<ManualViewerViewModel>();
 		builder.Services.AddTransient<ComparePartsViewModel>();
+		builder.Services.AddTransient<SettingsViewModel>();
 
 		// Pages
 		builder.Services.AddTransient<HomePage>();
@@ -70,6 +74,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<PartDetailsPage>();
 		builder.Services.AddTransient<ManualViewerPage>();
 		builder.Services.AddTransient<ComparePartsPage>();
+		builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

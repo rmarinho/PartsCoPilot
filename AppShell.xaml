@@ -28,6 +28,13 @@
             ContentTemplate="{DataTemplate views:FavoritesPage}"
             Route="favorites"
             AutomationId="FavoritesTab" />
+
+        <ShellContent
+            Title="Settings"
+            Icon="{OnPlatform Default='⚙️'}"
+            ContentTemplate="{DataTemplate views:SettingsPage}"
+            Route="settings"
+            AutomationId="SettingsTab" />
     </TabBar>
 
 </Shell>

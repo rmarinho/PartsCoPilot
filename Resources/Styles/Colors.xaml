@@ -86,4 +86,8 @@
     <!-- Buttons: ghost / clear-filter -->
     <Color x:Key="GhostButtonText_Light">#6E6E6E</Color>
     <Color x:Key="GhostButtonText_Dark">#A0A0B0</Color>
+
+    <!-- Semantic: success feedback -->
+    <Color x:Key="SuccessText_Light">#2E7D32</Color>
+    <Color x:Key="SuccessText_Dark">#66BB6A</Color>
 </ResourceDictionary>
