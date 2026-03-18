@@ -110,9 +110,9 @@ public class MigrationSystemTests : IDisposable
         retrieved.Should().NotBeNull();
         retrieved!.PartNumber.Should().Be("901-000-000-00");
         retrieved.Description.Should().Be("Old favorite");
-        // New fields should be null
+        // New fields should be null/default
         retrieved.Model.Should().BeNull();
-        retrieved.PageNumber.Should().BeNull();
+        retrieved.PageNumber.Should().Be(0);
         retrieved.Illustration.Should().BeNull();
     }
 
@@ -232,9 +232,10 @@ public class MigrationSystemTests : IDisposable
             Id = Guid.NewGuid().ToString(),
             ManualId = "test-manual",
             Code = "T",
-            Model = "911T",
+            ModelName = "911T",
             Variant = "Coupe",
-            YearRange = "1969-1973",
+            YearFrom = 1969,
+            YearTo = 1973,
             ChassisRange = "119300001-119310000"
         };
 
@@ -242,7 +243,7 @@ public class MigrationSystemTests : IDisposable
 
         var retrieved = await _db.FindAsync<VehicleTypeEntity>(vehicle.Id);
         retrieved.Should().NotBeNull();
-        retrieved!.Model.Should().Be("911T");
+        retrieved!.ModelName.Should().Be("911T");
         retrieved.Variant.Should().Be("Coupe");
     }
 
@@ -258,7 +259,7 @@ public class MigrationSystemTests : IDisposable
             Id = Guid.NewGuid().ToString(),
             ManualId = "test-manual",
             Code = "901/01",
-            Name = "Type 901/01",
+            EngineName = "Type 901/01",
             Displacement = "1991 cc",
             Power = "110 HP",
             ApplicableModels = "911T"
@@ -268,7 +269,7 @@ public class MigrationSystemTests : IDisposable
 
         var retrieved = await _db.FindAsync<EngineTypeEntity>(engine.Id);
         retrieved.Should().NotBeNull();
-        retrieved!.Name.Should().Be("Type 901/01");
+        retrieved!.EngineName.Should().Be("Type 901/01");
         retrieved.Displacement.Should().Be("1991 cc");
     }
 
@@ -284,7 +285,7 @@ public class MigrationSystemTests : IDisposable
             Id = Guid.NewGuid().ToString(),
             ManualId = "test-manual",
             Code = "905/00",
-            Name = "Type 905",
+            TransmissionName = "Type 905",
             Type = "5-speed manual",
             ApplicableModels = "911, 912"
         };
@@ -293,7 +294,7 @@ public class MigrationSystemTests : IDisposable
 
         var retrieved = await _db.FindAsync<TransmissionTypeEntity>(transmission.Id);
         retrieved.Should().NotBeNull();
-        retrieved!.Name.Should().Be("Type 905");
+        retrieved!.TransmissionName.Should().Be("Type 905");
         retrieved.Type.Should().Be("5-speed manual");
     }
 }
