@@ -32,3 +32,12 @@
 - **Roy's seed data (25 parts):** Ready to feed AI context. Seed data in `SeedDataService` provides candidates for PromptBuilder.
 - **Pris's FavoritesPage & PartDetailsPage:** Both can now leverage ManualNavigationService for page navigation. Commands (`OpenPageCommand`) are wired to both SearchViewModel and PartDetailsViewModel.
 - **Pris's result card actions:** AI service ready to power result ranking once integrated with SearchViewModel.
+
+### 2026-03-17 — Context Window Management (#9, PR #30)
+- **TokenEstimator**: Character-based heuristic (~4 chars/token) for estimating prompt token counts. Conservative upper bound prevents context window overruns.
+- **ContextBudget**: Configurable token limits (MaxContextTokens: 4000, MaxSnippetTokens: 1000, MaxDescriptionLength: 200). Allows model-specific tuning (GPT-4o: 128K, GPT-4o-mini: 16K).
+- **ContextTrimmer**: Sorts candidates by relevance score descending, preserves high-relevance results, drops low-relevance when budget exceeded. Truncates long descriptions with '...' suffix. Logs warnings when content is dropped.
+- **PromptBuilder integration**: Now uses ContextTrimmer (backward compatible, optional constructor). Existing code without trimmer continues to work.
+- **Key files**: `Services/TokenEstimator.cs`, `Services/ContextTrimmer.cs`, `Services/PromptBuilder.cs`, `Models/AiModels.cs` (removed duplicate ContextBudget).
+- **Testing**: 25 unit tests covering token estimation, budget enforcement, relevance ordering, truncation logic. All passing.
+- **Consolidation**: Moved ContextBudget from Models to Services namespace to eliminate duplicate definitions.

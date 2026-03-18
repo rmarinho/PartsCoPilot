@@ -8,6 +8,15 @@
 
 ## Learnings
 
+### 2026-03-17: README.md Created — Issue #11 Complete
+
+- **What:** Created comprehensive README.md covering all acceptance criteria for Issue #11.
+- **Content:** Project description, prerequisites (SDK + workloads for all platforms), build & run instructions (4 platforms), architecture overview with layered MVVM pattern, testing guide, project structure, contributing guidelines, roadmap, troubleshooting.
+- **Key decision:** Used existing docs/02-architecture.md for technical guidance; aligned README scope with Issue #11 acceptance criteria (not overreaching).
+- **Outcome:** PR #28 created, ready for squad review.
+- **Note:** Squad branch has other work (AI context window, accessibility, etc.) — README commit isolated to its own changeset for easy review.
+- **Team impact:** Unblocks open-source readiness; documentation now accessible to new contributors.
+
 <!-- Append learnings below -->
 
 ### 2025-07-18: Initial Codebase Assessment

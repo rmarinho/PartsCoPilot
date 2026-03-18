@@ -141,3 +141,24 @@
 - iOS: No special setup needed
 - Android: Will need `adb reverse/forward` when running on emulator
 - This project targets net11.0 for iOS, Android, and Mac Catalyst
+
+### Accessibility Audit + Dark Mode Support — COMPLETED (PR #29)
+
+**Issues:** #5 (Accessibility) and #8 (Dark Mode)
+
+**Accessibility (#5):**
+- Added SemanticProperties.Description to all buttons, entries, labels, pickers, progress bars across HomePage and SearchPage
+- Added SemanticProperties.Hint to all interactive controls (buttons, entries, pickers)
+- Added SemanticProperties.HeadingLevel: Level1 for page title, Level2 for subtitle, Level3 for section headers and result card part numbers
+- Added AutomationId to 31 controls for UI test automation
+- Tab order is logical — follows DOM/layout order
+
+**Dark Mode (#8):**
+- Created 13 semantic color pairs in Colors.xaml with Light/Dark variants: PageBackground, CardBackground, TextPrimary, TextSecondary, TextMuted, ErrorText, BadgeText, PrimaryButton (bg+text), SecondaryButton (bg+text), GhostButtonText
+- Replaced all hardcoded TextColor="Gray"/"White"/"Red" with AppThemeBinding references
+- Cards, badges, buttons, metadata text all theme-aware
+- Zero hardcoded color values remaining in Views/
+
+**Build:** ✅ 0 errors (maccatalyst), only pre-existing MAUIG2045 warnings
+**Branch:** squad/5-8-accessibility-dark-mode
+**PR:** #29

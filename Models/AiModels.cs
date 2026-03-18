@@ -32,3 +32,5 @@ public sealed record PromptContext(
     VehicleContext? VehicleContext,
     IReadOnlyList<SearchCandidate> Candidates,
     IReadOnlyList<string> PageSnippets);
+
+
