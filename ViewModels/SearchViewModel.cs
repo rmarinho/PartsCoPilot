@@ -215,7 +215,7 @@ public partial class SearchCandidateViewModel : ObservableObject
     public string? Model => Part.Model;
     public string? Illustration => Part.Illustration;
     public int PageNumber => Part.PageNumber;
-    public string Score => $"{Candidate.Score:P0}";
+    public string Score => $"{(int)(Candidate.Score * 100)}%";
     public string MatchReason => Candidate.MatchReason;
     public string? Remark => Part.Remark;
 
