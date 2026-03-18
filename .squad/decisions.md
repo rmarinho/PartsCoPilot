@@ -319,3 +319,63 @@
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+
+---
+
+## 2026-03-18T09:15:25Z: CI Fixed on Main + PR Review Complete
+
+### Roy: CI Failures Resolved
+
+**By:** Roy (Backend Dev)  
+**Status:** Completed  
+**Context:** Tests directory was being compiled into main project. Mac Catalyst runner overhead for test-only job.
+
+**Decisions:**
+1. Exclude `tests/` from main csproj via `DefaultItemExcludes`
+2. Replace Mac Catalyst build job with Ubuntu test-only job in ci.yml
+
+**Result:**
+- ✅ Main CI passing
+- ✅ Tests isolated from production code
+- ✅ CI costs reduced
+
+**Files Changed:**
+- `PartsCopilot.csproj` — test directory exclusion
+- `.github/workflows/ci.yml` — simplified job matrix
+
+---
+
+### Deckard: All PRs Approved & Merge Order Established
+
+**By:** Deckard (Lead)  
+**Status:** Completed  
+**Context:** 5 open PRs (#26, #27, #29, #30, #31) needed comprehensive review.
+
+**Verdicts:**
+- ✅ PR #26 (Prompt Injection) — APPROVE
+- ✅ PR #27 (N+1 Query Fix) — APPROVE
+- ✅ PR #29 (Accessibility + Dark Mode) — APPROVE
+- ✅ PR #30 (AI Context Window) — APPROVE
+- ✅ PR #31 (DB Migration + Parser) — APPROVE
+
+**Merge Order:**
+1. #27 (foundational data layer)
+2. #26 (AI security)
+3. #30 (extends #26)
+4. #31 (clean stack)
+5. #29 (XAML-only, last)
+
+**Status:** All branches rebased onto main. CI re-running. Ready for merge.
+
+---
+
+### Roy: README Approved
+
+**By:** Roy (Backend Dev)  
+**Status:** Completed  
+**Context:** Comprehensive README documenting architecture, build, dev setup.
+
+**Verdict:** ✅ APPROVE
+
+**Assessment:** Accurate, complete, clear. Sufficient for open-source readiness.
+
